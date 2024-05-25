@@ -8,8 +8,10 @@ namespace new_chess_server.Models
     public class User
     {
         public int Id { get; set; }
+        public string InteralID { get; set; } = "";
         public string Email { get; set; } = "";
         public string Name { get; set; } = "";
+        public string Picture { get; set; } = "";
         public string Provider { get; set; } = "Google";
     }
 }

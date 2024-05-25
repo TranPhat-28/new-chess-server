@@ -34,10 +34,4 @@ namespace new_chess_server.Models
         public string Error { get; set; } = "";
         public string Error_description { get; set; } = "";
     }
-
-    public class GetGoogleTokenVerification
-    {
-        public GoogleApiResponseType ResponseType { get; set; }
-        public string Value { get; set; } = "";
-    }
 }

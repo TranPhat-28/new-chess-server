@@ -4,6 +4,7 @@ global using new_chess_server.DTOs.AuthenticationDTO;
 global using new_chess_server.Services.Authentication;
 global using Microsoft.EntityFrameworkCore;
 using new_chess_server.Data;
+using new_chess_server.Services.OAuth;
 
 // Enable CORS
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -31,7 +32,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Dependency Injection
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IOAuthService, OAuthService>();
 
 var app = builder.Build();
 
