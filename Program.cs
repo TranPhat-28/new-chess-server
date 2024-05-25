@@ -2,6 +2,8 @@ global using new_chess_server.Models;
 global using new_chess_server.Models.Enums;
 global using new_chess_server.DTOs.AuthenticationDTO;
 global using new_chess_server.Services.Authentication;
+global using Microsoft.EntityFrameworkCore;
+using new_chess_server.Data;
 
 // Enable CORS
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -17,6 +19,10 @@ builder.Services.AddCors(options =>
             policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
         });
 });
+
+// Add the DbContext
+builder.Services.AddDbContext<DataContext>(options
+    => options.UseNpgsql(builder.Configuration["Data:DefaultConnection"]));
 
 // Add services to the container.
 
