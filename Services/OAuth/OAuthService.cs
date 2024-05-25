@@ -9,13 +9,13 @@ namespace new_chess_server.Services.OAuth
     {
         public async Task<ServiceResponse<GoogleApiResponse>> VerifyGoogleIDToken(string googleIDToken)
         {
-            using HttpClient client = new()
-            {
-                BaseAddress = new Uri("https://oauth2.googleapis.com")
-            };
-
             try
             {
+                using HttpClient client = new()
+                {
+                    BaseAddress = new Uri("https://oauth2.googleapis.com")
+                };
+
                 // Make the request
                 HttpResponseMessage response = await client.GetAsync($"tokeninfo?id_token={googleIDToken}");
 

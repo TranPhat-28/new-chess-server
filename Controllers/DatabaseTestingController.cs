@@ -23,8 +23,10 @@ namespace new_chess_server.Controllers
         {
             User mockUser = new User()
             {
-                Email = "mock@mail.com",
-                Name = "Mock"
+                ExternalID = "114299150669811858083",
+                Email = "jamesjohnjj89104@gmail.com",
+                Name = "James John",
+                Picture = "https://lh3.googleusercontent.com/a/ACg8ocKLj4uYpLkq7HcbssTy1QFP6R5xgS3AaJ9kM7DIAceONCex-wQ=s96-c"
             };
 
             _dataContext.Users.Add(mockUser);
