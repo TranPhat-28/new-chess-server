@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using System.Net.Http.Json;
 using new_chess_server.Services.OAuth;
 using new_chess_server.Data;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace new_chess_server.Services.Authentication
 {
@@ -12,11 +15,13 @@ namespace new_chess_server.Services.Authentication
     {
         private readonly IOAuthService _oAuthService;
         private readonly DataContext _dataContext;
+        private readonly IConfiguration _configuration;
 
-        public AuthenticationService(IOAuthService oAuthService, DataContext dataContext)
+        public AuthenticationService(IOAuthService oAuthService, DataContext dataContext, IConfiguration configuration)
         {
             _oAuthService = oAuthService;
             _dataContext = dataContext;
+            _configuration = configuration;
         }
 
         public async Task<ServiceResponse<string>> LoginWithGoogle(AuthenticationPostDto authenticationPostDto)
@@ -38,7 +43,8 @@ namespace new_chess_server.Services.Authentication
                     // If already in db then return JWT
                     if (user is not null)
                     {
-                        response.Data = "JWT";
+                        var newJWT = CreateJWTToken(user);
+                        response.Data = newJWT;
                     }
                     // If not in db then Register
                     else
@@ -56,12 +62,13 @@ namespace new_chess_server.Services.Authentication
                         await _dataContext.SaveChangesAsync();
 
                         // Then create and return a JWT
-                        response.Data = "Register";
+                        var newJWT = CreateJWTToken(newUser);
+                        response.Data = newJWT;
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Error: ------------------------");
+                    Console.WriteLine("[Error]: Error occured in AuthenticationService---------------");
                     Console.WriteLine(result.Message);
 
                     response.IsSuccess = false;
@@ -72,18 +79,56 @@ namespace new_chess_server.Services.Authentication
             }
             catch (Exception e)
             {
+                Console.WriteLine("[Exception]: Exception occured in AuthenticationService---------------");
                 Console.WriteLine(e.Message);
 
                 response.IsSuccess = false;
-                response.Message = "Interal server error";
+                response.Message = "Error performing login in.";
 
                 return response;
             }
         }
 
-        private string CreateJWT()
+        private string CreateJWTToken(User user)
         {
-            return "JWT";
+            // The list of Claims
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.Name)
+            };
+
+            // Getting the secret from User Secrets
+            var secretToken = _configuration.GetSection("JWT:Token").Value;
+
+            // Check if token is null
+            if (secretToken is null)
+            {
+                throw new Exception("AppSettings token is null!");
+            }
+
+            // Symmetric key for the token with secret is the AppSettings token
+            SymmetricSecurityKey key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(secretToken));
+
+            // For signing the token
+            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            // Storing some information such as Claims and Expiring day for the final token
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddDays(1),
+                SigningCredentials = creds
+            };
+
+            // JWT handler
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            // Use the handler to create the token with the tokenDescriptor
+            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+
+            // Write the token
+            return tokenHandler.WriteToken(token);
         }
     }
 }

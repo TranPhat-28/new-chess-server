@@ -47,6 +47,7 @@ namespace new_chess_server.Services.OAuth
             }
             catch (Exception e)
             {
+                Console.WriteLine("[Exception]: Exception occured in OAuthService---------------");
                 Console.WriteLine(e);
 
                 var result = new ServiceResponse<GoogleApiResponse>()

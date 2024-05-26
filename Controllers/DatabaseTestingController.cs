@@ -12,13 +12,15 @@ namespace new_chess_server.Controllers
     public class DatabaseTestingController : ControllerBase
     {
         private readonly DataContext _dataContext;
+        private readonly IConfiguration _configuration;
 
-        public DatabaseTestingController(DataContext dataContext)
+        public DatabaseTestingController(DataContext dataContext, IConfiguration configuration)
         {
             _dataContext = dataContext;
+            _configuration = configuration;
         }
 
-        [HttpGet("/CreateMock")]
+        [HttpGet("CreateMock")]
         public async Task<ActionResult<string>> ConnectionTesting()
         {
             User mockUser = new User()
@@ -33,6 +35,14 @@ namespace new_chess_server.Controllers
             await _dataContext.SaveChangesAsync();
 
             return "OK";
+        }
+
+        [HttpGet("UserSecret")]
+        public string ReadFromUserSecrets()
+        {
+            var secret = _configuration.GetSection("JWT:Token").Value;
+            Console.WriteLine(secret);
+            return "Ok";
         }
     }
 }
