@@ -40,9 +40,16 @@ namespace new_chess_server.Controllers
         [HttpGet("UserSecret")]
         public string ReadFromUserSecrets()
         {
-            var secret = _configuration.GetSection("JWT:Token").Value;
-            Console.WriteLine(secret);
-            return "Ok";
+            string? secret = Environment.GetEnvironmentVariable("TESTING_VARIABLE");
+
+            if (secret is not null)
+            {
+                return secret;
+            }
+            else
+            {
+                return "Secret is null";
+            }
         }
     }
 }
