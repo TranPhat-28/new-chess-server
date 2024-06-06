@@ -12,4 +12,8 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /App
 COPY --from=build-env /App/out .
+
+# Copy stockfish executable into the container
+# COPY Stockfish/stockfish-ubuntu ./Stockfish/
+
 ENTRYPOINT ["dotnet", "new-chess-server.dll"]

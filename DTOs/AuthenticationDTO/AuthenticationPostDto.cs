@@ -7,7 +7,7 @@ namespace new_chess_server.DTOs.AuthenticationDTO
 {
     public class AuthenticationPostDto
     {
-        public string Provider { get; set; } = "Google";
+        public string Provider { get; set; } = "";
         public string Token { get; set; } = "";
     }
 }

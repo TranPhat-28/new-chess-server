@@ -29,64 +29,48 @@ namespace new_chess_server.Services.Authentication
             // Response
             var response = new ServiceResponse<string>();
 
-            try
+            // Verify the token
+            var result = await _oAuthService.VerifyGoogleIDToken(authenticationPostDto.Token);
+
+            // Token is valid, perform register or login accordingly
+            if (result.IsSuccess)
             {
-                // Verify the token
-                var result = await _oAuthService.VerifyGoogleIDToken(authenticationPostDto.Token);
+                // Check if user is in db
+                var user = await _dataContext.Users.FirstOrDefaultAsync(user => user.Email == result.Data!.Email && user.ExternalID == result.Data!.Sub);
 
-                // Token is valid, perform register or login accordingly
-                if (result.IsSuccess)
+                // If already in db then return JWT
+                if (user is not null)
                 {
-                    // Check if user is in db
-                    var user = await _dataContext.Users.FirstOrDefaultAsync(user => user.Email == result.Data!.Email && user.ExternalID == result.Data!.Sub);
-
-                    // If already in db then return JWT
-                    if (user is not null)
-                    {
-                        var newJWT = CreateJWTToken(user);
-                        response.Data = newJWT;
-                    }
-                    // If not in db then Register
-                    else
-                    {
-                        // Register by adding user to db
-                        User newUser = new User()
-                        {
-                            Email = result.Data!.Email,
-                            Name = result.Data!.Name,
-                            ExternalID = result.Data!.Sub,
-                            Picture = result.Data!.Picture
-                        };
-
-                        _dataContext.Users.Add(newUser);
-                        await _dataContext.SaveChangesAsync();
-
-                        // Then create and return a JWT
-                        var newJWT = CreateJWTToken(newUser);
-                        response.Data = newJWT;
-                    }
+                    var newJWT = CreateJWTToken(user);
+                    response.Data = newJWT;
                 }
+                // If not in db then Register
                 else
                 {
-                    Console.WriteLine("[Error]: Error occured in AuthenticationService---------------");
-                    Console.WriteLine(result.Message);
+                    // Register by adding user to db
+                    User newUser = new User()
+                    {
+                        Email = result.Data!.Email,
+                        Name = result.Data!.Name,
+                        ExternalID = result.Data!.Sub,
+                        Picture = result.Data!.Picture
+                    };
 
-                    response.IsSuccess = false;
-                    response.Message = "We cannot connect you to our system right now.";
+                    _dataContext.Users.Add(newUser);
+                    await _dataContext.SaveChangesAsync();
+
+                    // Then create and return a JWT
+                    var newJWT = CreateJWTToken(newUser);
+                    response.Data = newJWT;
                 }
-
-                return response;
             }
-            catch (Exception e)
+            else
             {
-                Console.WriteLine("[Exception]: Exception occured in AuthenticationService---------------");
-                Console.WriteLine(e.Message);
-
                 response.IsSuccess = false;
-                response.Message = "Error performing login in.";
-
-                return response;
+                response.Message = "We could not verify you with the provider.";
             }
+
+            return response;
         }
 
         private string CreateJWTToken(User user)
@@ -100,12 +84,16 @@ namespace new_chess_server.Services.Authentication
             };
 
             // Getting the secret from User Secrets
-            var secretToken = _configuration.GetSection("JWT:Token").Value;
+
+            // Use GetSection for local development
+            // Use Environment.GetEnvironmentVariable for production
+            // var secretToken = _configuration.GetSection("JWT:Token").Value;
+            var secretToken = Environment.GetEnvironmentVariable("JWTSecretString");
 
             // Check if token is null
             if (secretToken is null)
             {
-                throw new Exception("AppSettings token is null!");
+                throw new Exception("AppSettings token is null");
             }
 
             // Symmetric key for the token with secret is the AppSettings token

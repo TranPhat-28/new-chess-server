@@ -26,8 +26,19 @@ namespace new_chess_server.Controllers
             }
             else
             {
-                var response = await _authenticationService.LoginWithGoogle(authenticationPostDto);
-                return response;
+                try
+                {
+                    var response = new ServiceResponse<string>();
+                    response = await _authenticationService.LoginWithGoogle(authenticationPostDto);
+
+                    return response;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("[AuthenticationController] " + e.Message);
+
+                    return StatusCode(500);
+                }
             }
         }
     }
