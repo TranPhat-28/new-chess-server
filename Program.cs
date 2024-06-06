@@ -21,9 +21,13 @@ builder.Services.AddCors(options =>
         });
 });
 
+// The Connection string
+var ConnectionString = Environment.GetEnvironmentVariable("DefaultDatabaseConnectionString");
+// var ConnectionString = builder.Configuration["Data:DefaultConnection"];
+
 // Add the DbContext
 builder.Services.AddDbContext<DataContext>(options
-    => options.UseNpgsql(builder.Configuration["Data:DefaultConnection"]));
+    => options.UseNpgsql(ConnectionString));
 
 // Add services to the container.
 
