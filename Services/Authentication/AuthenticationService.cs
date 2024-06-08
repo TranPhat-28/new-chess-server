@@ -87,6 +87,7 @@ namespace new_chess_server.Services.Authentication
 
             // Use GetSection for local development
             // Use Environment.GetEnvironmentVariable for production
+            
             // var secretToken = _configuration.GetSection("JWT:Token").Value;
             var secretToken = Environment.GetEnvironmentVariable("JWTSecretString");
 

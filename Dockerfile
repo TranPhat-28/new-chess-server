@@ -14,6 +14,6 @@ WORKDIR /App
 COPY --from=build-env /App/out .
 
 # Copy stockfish executable into the container
-# COPY Stockfish/stockfish-ubuntu ./Stockfish/
+COPY Stockfish/stockfish-ubuntu ./Stockfish/
 
 ENTRYPOINT ["dotnet", "new-chess-server.dll"]

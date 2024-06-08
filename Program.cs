@@ -3,8 +3,10 @@ global using new_chess_server.Models.Enums;
 global using new_chess_server.DTOs.AuthenticationDTO;
 global using new_chess_server.Services.Authentication;
 global using Microsoft.EntityFrameworkCore;
+global using new_chess_server.Stockfish;
 using new_chess_server.Data;
 using new_chess_server.Services.OAuth;
+using new_chess_server.Services.QuickPlay;
 
 // Enable CORS
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -39,6 +41,7 @@ builder.Services.AddSwaggerGen();
 // Dependency Injection
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IOAuthService, OAuthService>();
+builder.Services.AddSingleton<IQuickPlayHandlerService, QuickPlayHandlerService>();
 
 var app = builder.Build();
 
