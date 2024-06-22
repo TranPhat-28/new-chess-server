@@ -30,8 +30,8 @@ builder.Services.AddCors(options =>
 
 // -----------CHANGE FOR DEPLOYMENT----------------
 // The Connection string
-// var ConnectionString = Environment.GetEnvironmentVariable("DefaultDatabaseConnectionString");
-var ConnectionString = builder.Configuration["Data:DefaultConnection"];
+var ConnectionString = Environment.GetEnvironmentVariable("DefaultDatabaseConnectionString");
+// var ConnectionString = builder.Configuration["Data:DefaultConnection"];
 
 // Add the DbContext
 builder.Services.AddDbContext<DataContext>(options
@@ -54,8 +54,8 @@ builder.Services.AddSingleton<IQuickPlayHandlerService, QuickPlayHandlerService>
 
 // -----------CHANGE FOR DEPLOYMENT----------------
 // JWT Secret
-var secretToken = builder.Configuration["JWT:Token"];
-// var secretToken = Environment.GetEnvironmentVariable("JWTSecretString");
+// var secretToken = builder.Configuration["JWT:Token"];
+var secretToken = Environment.GetEnvironmentVariable("JWTSecretString");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {

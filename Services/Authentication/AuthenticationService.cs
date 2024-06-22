@@ -101,8 +101,8 @@ namespace new_chess_server.Services.Authentication
             // Use Environment.GetEnvironmentVariable for production
 
             // -----------CHANGE FOR DEPLOYMENT----------------
-            var secretToken = _configuration.GetSection("JWT:Token").Value;
-            // var secretToken = Environment.GetEnvironmentVariable("JWTSecretString");
+            // var secretToken = _configuration.GetSection("JWT:Token").Value;
+            var secretToken = Environment.GetEnvironmentVariable("JWTSecretString");
 
             // Check if token is null
             if (secretToken is null)
