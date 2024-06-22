@@ -56,7 +56,19 @@ namespace new_chess_server.Services.Authentication
                         Picture = result.Data!.Picture
                     };
 
+                    // Create a new GameStatistic instance
+                    GameStatistic newStatistic = new GameStatistic()
+                    {
+                        // Establish the relationship to the User
+                        User = newUser
+                    };
+
+                    // Establish the relationship from User to the GameStatistic
+                    newUser.Statistic = newStatistic;
+
                     _dataContext.Users.Add(newUser);
+                    _dataContext.GameStatistics.Add(newStatistic);
+
                     await _dataContext.SaveChangesAsync();
 
                     // Then create and return a JWT
@@ -87,10 +99,10 @@ namespace new_chess_server.Services.Authentication
 
             // Use GetSection for local development
             // Use Environment.GetEnvironmentVariable for production
-            
+
             // -----------CHANGE FOR DEPLOYMENT----------------
-            // var secretToken = _configuration.GetSection("JWT:Token").Value;
-            var secretToken = Environment.GetEnvironmentVariable("JWTSecretString");
+            var secretToken = _configuration.GetSection("JWT:Token").Value;
+            // var secretToken = Environment.GetEnvironmentVariable("JWTSecretString");
 
             // Check if token is null
             if (secretToken is null)
