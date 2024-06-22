@@ -19,6 +19,27 @@ namespace new_chess_server.Services.Profile
             _dataContext = dataContext;
             _mapper = mapper;
         }
+
+        public async Task<ServiceResponse<UserGameStatisticDto>> GetUserGameStatistic()
+        {
+            var response = new ServiceResponse<UserGameStatisticDto>();
+
+            // The user id taken from the JWT token
+            int userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            // Query from DB
+            var gameStatistic = await _dataContext.GameStatistics.FirstOrDefaultAsync(stat => stat.UserId == userId);
+
+            if (gameStatistic is null)
+            {
+                throw new Exception("Cannot find game statistic result in DB");
+            }
+
+            response.Data = _mapper.Map<UserGameStatisticDto>(gameStatistic);
+
+            return response;
+        }
+
         public async Task<ServiceResponse<UserProfileDto>> GetUserProfile()
         {
             var response = new ServiceResponse<UserProfileDto>();

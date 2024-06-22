@@ -9,5 +9,6 @@ namespace new_chess_server.Services.Profile
     public interface IProfileSerivce
     {
         Task<ServiceResponse<UserProfileDto>> GetUserProfile();
+        Task<ServiceResponse<UserGameStatisticDto>> GetUserGameStatistic();
     }
 }

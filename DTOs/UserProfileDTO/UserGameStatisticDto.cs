@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace new_chess_server.Models
+namespace new_chess_server.DTOs.UserProfileDTO
 {
-    public class GameStatistic
+    public class UserGameStatisticDto
     {
-        public int Id { get; set; }
         public int Ranking { get; set; } = 0;
         public int PracticePlayedEasy { get; set; } = 0;
         public int PracticeVictoryEasy { get; set; } = 0;
@@ -17,7 +16,5 @@ namespace new_chess_server.Models
         public int PracticeVictoryHard { get; set; } = 0;
         public int OnlinePlayed { get; set; } = 0;
         public int OnlineVictory { get; set; } = 0;
-        public User? User { get; set; }
-        public int UserId { get; set; }
     }
 }

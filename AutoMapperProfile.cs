@@ -11,6 +11,7 @@ namespace new_chess_server
         public AutoMapperProfile()
         {
             CreateMap<User, UserProfileDto>();
+            CreateMap<GameStatistic, UserGameStatisticDto>();
         }
     }
 }

@@ -38,5 +38,24 @@ namespace new_chess_server.Controllers
                 return StatusCode(500);
             }
         }
+
+        [Authorize]
+        [HttpGet("GetStatistic")]
+        public async Task<ActionResult<ServiceResponse<UserGameStatisticDto>>> GetUserGameStatistic()
+        {
+            try
+            {
+                var response = new ServiceResponse<UserGameStatisticDto>();
+                response = await _profileSerivce.GetUserGameStatistic();
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[ProfileController] " + e.Message);
+
+                return StatusCode(500);
+            }
+        }
     }
 }
