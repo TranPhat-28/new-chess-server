@@ -53,7 +53,7 @@ namespace new_chess_server.Services.Authentication
                         Email = result.Data!.Email,
                         Name = result.Data!.Name,
                         ExternalID = result.Data!.Sub,
-                        Picture = result.Data!.Picture
+                        Picture = result.Data!.Picture.Replace("s96-c", "s192-c")
                     };
 
                     // Create a new GameStatistic instance
