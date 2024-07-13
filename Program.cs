@@ -12,6 +12,7 @@ using new_chess_server.Services.QuickPlay;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using new_chess_server.Services.Profile;
+using new_chess_server.Services.Social;
 
 // Enable CORS
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -30,8 +31,8 @@ builder.Services.AddCors(options =>
 
 // -----------CHANGE FOR DEPLOYMENT----------------
 // The Connection string
-// var ConnectionString = Environment.GetEnvironmentVariable("DefaultDatabaseConnectionString");
-var ConnectionString = builder.Configuration["Data:DefaultConnection"];
+var ConnectionString = Environment.GetEnvironmentVariable("DefaultDatabaseConnectionString");
+// var ConnectionString = builder.Configuration["Data:DefaultConnection"];
 
 // Add the DbContext
 builder.Services.AddDbContext<DataContext>(options
@@ -51,11 +52,12 @@ builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IOAuthService, OAuthService>();
 builder.Services.AddScoped<IProfileSerivce, ProfileService>();
 builder.Services.AddSingleton<IQuickPlayHandlerService, QuickPlayHandlerService>();
+builder.Services.AddScoped<ISocialService, SocialService>();
 
 // -----------CHANGE FOR DEPLOYMENT----------------
 // JWT Secret
-var secretToken = builder.Configuration["JWT:Token"];
-// var secretToken = Environment.GetEnvironmentVariable("JWTSecretString");
+// var secretToken = builder.Configuration["JWT:Token"];
+var secretToken = Environment.GetEnvironmentVariable("JWTSecretString");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
