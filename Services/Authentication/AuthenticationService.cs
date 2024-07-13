@@ -8,6 +8,8 @@ using new_chess_server.Data;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using shortid;
+using shortid.Configuration;
 
 namespace new_chess_server.Services.Authentication
 {
@@ -53,7 +55,8 @@ namespace new_chess_server.Services.Authentication
                         Email = result.Data!.Email,
                         Name = result.Data!.Name,
                         ExternalID = result.Data!.Sub,
-                        Picture = result.Data!.Picture.Replace("s96-c", "s192-c")
+                        Picture = result.Data!.Picture.Replace("s96-c", "s192-c"),
+                        SocialId = ShortId.Generate(new GenerationOptions(useNumbers: true, useSpecialCharacters: false, length: 12)),
                     };
 
                     // Create a new GameStatistic instance
@@ -101,8 +104,8 @@ namespace new_chess_server.Services.Authentication
             // Use Environment.GetEnvironmentVariable for production
 
             // -----------CHANGE FOR DEPLOYMENT----------------
-            // var secretToken = _configuration.GetSection("JWT:Token").Value;
-            var secretToken = Environment.GetEnvironmentVariable("JWTSecretString");
+            var secretToken = _configuration.GetSection("JWT:Token").Value;
+            // var secretToken = Environment.GetEnvironmentVariable("JWTSecretString");
 
             // Check if token is null
             if (secretToken is null)

@@ -13,5 +13,6 @@ namespace new_chess_server.DTOs.UserProfileDTO
         public string Picture { get; set; } = "";
         public string Provider { get; set; } = "";
         public string DateJoined { get; set; } = "";
+        public string SocialId { get; set; } = "";
     }
 }

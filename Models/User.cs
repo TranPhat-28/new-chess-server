@@ -14,6 +14,7 @@ namespace new_chess_server.Models
         public string Picture { get; set; } = "";
         public string Provider { get; set; } = "Google";
         public string DateJoined { get; set; } = DateTime.Now.ToString("dd/MM/yyyy");
+        public string SocialId { get; set; } = "";
         public GameStatistic? Statistic { get; set; }
     }
 }
