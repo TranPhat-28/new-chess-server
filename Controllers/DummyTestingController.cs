@@ -24,7 +24,9 @@ namespace new_chess_server.Controllers
         {
             var response = new ServiceResponse<string>();
 
+            // User 1: Winston
             User? user1 = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == 1);
+            // User 2: James
             User? user2 = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == 4);
 
             // if (user1 == null || user2 == null)
@@ -33,7 +35,9 @@ namespace new_chess_server.Controllers
             //     return response;
             // }
 
+            // Winston has James as friend
             user1!.FriendList.Add(user2!);
+            
             // user2.FriendList!.Add(user1);
             
             // Else check for duplicates before adding

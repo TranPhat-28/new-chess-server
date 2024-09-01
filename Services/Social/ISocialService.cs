@@ -9,5 +9,6 @@ namespace new_chess_server.Services.Social
     public interface ISocialService
     {
         Task<ServiceResponse<SearchWithSocialIdResultDto>> SearchWithSocialId(GetSearchWithSocialIdDto getSearchWithSocialIdDto);
+        Task<ServiceResponse<SearchDetailsResultDto>> SearchDetailWithSocialId(GetSearchWithSocialIdDto getSearchWithSocialIdDto);
     }
 }

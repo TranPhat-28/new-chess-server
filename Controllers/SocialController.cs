@@ -10,6 +10,7 @@ using new_chess_server.Services.Social;
 
 namespace new_chess_server.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class SocialController : ControllerBase
@@ -21,7 +22,6 @@ namespace new_chess_server.Controllers
             _socialService = socialService;
         }
 
-        [Authorize]
         [HttpPost("Search")]
         public async Task<ActionResult<ServiceResponse<SearchWithSocialIdResultDto>>> SearchWithSocialId(GetSearchWithSocialIdDto getSearchWithSocialIdDto)
         {
@@ -46,6 +46,32 @@ namespace new_chess_server.Controllers
                     return StatusCode(500);
                 }
             }
+        }
+
+        [HttpPost("Detail")]
+        public async Task<ActionResult<ServiceResponse<SearchDetailsResultDto>>> SearchDetailWithSocialId(GetSearchWithSocialIdDto getSearchWithSocialIdDto)
+        {
+            if (getSearchWithSocialIdDto.SocialId == "")
+            {
+                return BadRequest("Missing required field(s)");
+            }
+            // Search
+            else
+            {
+                try
+                {
+                    var response = new ServiceResponse<SearchDetailsResultDto>();
+                    response = await _socialService.SearchDetailWithSocialId(getSearchWithSocialIdDto);
+                    return response;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("[SocialController] " + e.Message);
+
+                    return StatusCode(500);
+                }
+            }
+
         }
     }
 }
