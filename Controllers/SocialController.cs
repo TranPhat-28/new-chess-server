@@ -10,7 +10,7 @@ using new_chess_server.Services.Social;
 
 namespace new_chess_server.Controllers
 {
-    [Authorize]
+    // [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class SocialController : ControllerBase
@@ -72,6 +72,78 @@ namespace new_chess_server.Controllers
                 }
             }
 
+        }
+
+        [HttpPost("Request/Create")]
+        public async Task<ActionResult<ServiceResponse<string>>> SendFriendRequest()
+        {
+            // if ()
+            // {
+            //     return BadRequest("Missing required field(s)");
+            // }
+            // else
+            // {
+            try
+            {
+                var response = new ServiceResponse<string>();
+                response = await _socialService.SendFriendRequest();
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[SocialController] " + e.Message);
+
+                return StatusCode(500);
+            }
+            // }
+        }
+
+        [HttpPost("Request/Remove")]
+        public async Task<ActionResult<ServiceResponse<string>>> RemoveFriendRequest()
+        {
+            // if ()
+            // {
+            //     return BadRequest("Missing required field(s)");
+            // }
+            // else
+            // {
+            try
+            {
+                var response = new ServiceResponse<string>();
+                response = await _socialService.RemoveFriendRequest();
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[SocialController] " + e.Message);
+
+                return StatusCode(500);
+            }
+            // }
+        }
+
+        [HttpDelete("Friend")]
+        public async Task<ActionResult<ServiceResponse<string>>> RemoveFriend()
+        {
+            // if ()
+            // {
+            //     return BadRequest("Missing required field(s)");
+            // }
+            // else
+            // {
+            try
+            {
+                var response = new ServiceResponse<string>();
+                response = await _socialService.RemoveFriend();
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[SocialController] " + e.Message);
+
+                return StatusCode(500);
+            }
+            // }
         }
     }
 }

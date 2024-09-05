@@ -88,5 +88,35 @@ namespace new_chess_server.Services.Social
 
             return response;
         }
+
+        public async Task<ServiceResponse<string>> SendFriendRequest()
+        {
+            var response = new ServiceResponse<string>
+            {
+                Data = "Friend Request Created"
+            };
+
+            return response;
+        }
+
+        public async Task<ServiceResponse<string>> RemoveFriendRequest()
+        {
+            var response = new ServiceResponse<string>
+            {
+                Data = "Friend Request Removed"
+            };
+
+            return response;
+        }
+
+        public async Task<ServiceResponse<string>> RemoveFriend()
+        {
+            var response = new ServiceResponse<string>
+            {
+                Data = "Remove Friend"
+            };
+
+            return response;
+        }
     }
 }
