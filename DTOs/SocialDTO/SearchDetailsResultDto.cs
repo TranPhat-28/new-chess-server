@@ -10,6 +10,5 @@ namespace new_chess_server.DTOs.SocialDTO
         public string Name { get; set; } = "";
         public string Picture { get; set; } = "";
         public string Rank { get; set; } = "N/A";
-        public bool IsFriend { get; set; }
     }
 }

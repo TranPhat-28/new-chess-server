@@ -15,5 +15,6 @@ namespace new_chess_server.Data
 
         public DbSet<User> Users => Set<User>();
         public DbSet<GameStatistic> GameStatistics => Set<GameStatistic>();
+        public DbSet<FriendRequest> FriendRequests => Set<FriendRequest>();
     }
 }

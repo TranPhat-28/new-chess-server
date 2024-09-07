@@ -34,39 +34,11 @@ namespace new_chess_server.Services.Social
             }
             else
             {
-                SearchDetailsResultDto data = new SearchDetailsResultDto
+                response.Data = new SearchDetailsResultDto
                 {
                     Name = result.Name,
                     Picture = result.Picture,
-                    IsFriend = false
                 };
-
-                // Authed User ID
-                var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-                // Search for friend status with current user
-                var userData = await _dataContext.Users.Include(u => u.FriendList).FirstOrDefaultAsync(u => u.Id == userId);
-
-                // Look for friend status with target search
-                if (userData!.FriendList is null)
-                {
-                    data.IsFriend = false;
-                }
-                else
-                {
-                    var friendStatus = userData!.FriendList.FirstOrDefault(f => f.SocialId == getSearchWithSocialIdDto.SocialId);
-
-                    if (friendStatus is null)
-                    {
-                        data.IsFriend = false;
-                    }
-                    else
-                    {
-                        data.IsFriend = true;
-                    }
-                }
-
-                response.Data = data;
             }
 
             return response;
@@ -116,6 +88,67 @@ namespace new_chess_server.Services.Social
                 Data = "Remove Friend"
             };
 
+            return response;
+        }
+
+        public async Task<ServiceResponse<RelationshipResultDto>> GetRelationship(string socialId)
+        {
+            var response = new ServiceResponse<RelationshipResultDto>
+            {
+                Data = new RelationshipResultDto()
+            };
+
+            // Authed User ID
+            var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            // CHECK FOR IS FRIEND RELATIONSHIP
+            // Search for friend status with current user
+            var userData = await _dataContext.Users.Include(u => u.FriendList).FirstOrDefaultAsync(u => u.Id == userId);
+
+            // Look for friend status with target search
+            if (userData!.FriendList is null)
+            {
+                response.Data!.IsFriend = false;
+            }
+            else
+            {
+                var friendStatus = userData!.FriendList.FirstOrDefault(f => f.SocialId == socialId);
+
+                if (friendStatus is null)
+                {
+                    response.Data!.IsFriend = false;
+                }
+                else
+                {
+                    response.Data!.IsFriend = true;
+                }
+            }
+
+            // CHECK FOR FRIEND REQUEST STATUS (only if not friend yet)
+            if (response.Data.IsFriend == false)
+            {
+                var target = await _dataContext.Users.FirstOrDefaultAsync(u => u.SocialId == socialId);
+
+                // Sender: User
+                // Receiver: Target
+                var friendRequestA = await _dataContext.FriendRequests.FirstOrDefaultAsync(r => r.SenderId == userId && r.ReceiverId == target!.Id);
+
+                if (friendRequestA is not null)
+                {
+                    response.Data.IsRequestSender = true;
+                    return response;
+                }
+
+                // Sender: Target
+                // Receiver: User
+                var friendRequestB = await _dataContext.FriendRequests.FirstOrDefaultAsync(r => r.SenderId == target!.Id && r.ReceiverId == userId);
+
+                if (friendRequestB is not null)
+                {
+                    response.Data.IsRequestReceiver = true;
+                    return response;
+                }
+            }
             return response;
         }
     }

@@ -74,6 +74,23 @@ namespace new_chess_server.Controllers
 
         }
 
+        [HttpGet("Relationship/{socialId}")]
+        public async Task<ActionResult<ServiceResponse<RelationshipResultDto>>> GetRelationship(string socialId)
+        {
+            try
+            {
+                var response = new ServiceResponse<RelationshipResultDto>();
+                response = await _socialService.GetRelationship(socialId);
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[SocialController] " + e.Message);
+
+                return StatusCode(500);
+            }
+        }
+
         [HttpPost("Request/Create")]
         public async Task<ActionResult<ServiceResponse<string>>> SendFriendRequest()
         {
