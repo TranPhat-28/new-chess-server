@@ -91,7 +91,7 @@ namespace new_chess_server.Controllers
             }
         }
 
-        [HttpPost("Request/Create")]
+        [HttpPost("Request/Send")]
         public async Task<ActionResult<ServiceResponse<string>>> SendFriendRequest()
         {
             // if ()
@@ -115,7 +115,7 @@ namespace new_chess_server.Controllers
             // }
         }
 
-        [HttpPost("Request/Remove")]
+        [HttpPost("Request/Cancel")]
         public async Task<ActionResult<ServiceResponse<string>>> RemoveFriendRequest()
         {
             // if ()
@@ -128,6 +128,30 @@ namespace new_chess_server.Controllers
             {
                 var response = new ServiceResponse<string>();
                 response = await _socialService.RemoveFriendRequest();
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[SocialController] " + e.Message);
+
+                return StatusCode(500);
+            }
+            // }
+        }
+
+        [HttpPost("Request/Accept")]
+        public async Task<ActionResult<ServiceResponse<string>>> AcceptFriendRequest()
+        {
+            // if ()
+            // {
+            //     return BadRequest("Missing required field(s)");
+            // }
+            // else
+            // {
+            try
+            {
+                var response = new ServiceResponse<string>();
+                response = await _socialService.AcceptFriendRequest();
                 return response;
             }
             catch (Exception e)

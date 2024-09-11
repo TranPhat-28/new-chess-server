@@ -65,7 +65,7 @@ namespace new_chess_server.Services.Social
         {
             var response = new ServiceResponse<string>
             {
-                Data = "Friend Request Created"
+                Data = "Friend Request Sent"
             };
 
             return response;
@@ -75,7 +75,17 @@ namespace new_chess_server.Services.Social
         {
             var response = new ServiceResponse<string>
             {
-                Data = "Friend Request Removed"
+                Data = "Friend Request Cancelled"
+            };
+
+            return response;
+        }
+
+        public async Task<ServiceResponse<string>> AcceptFriendRequest()
+        {
+            var response = new ServiceResponse<string>
+            {
+                Data = "Friend Request Accepted"
             };
 
             return response;
@@ -85,7 +95,7 @@ namespace new_chess_server.Services.Social
         {
             var response = new ServiceResponse<string>
             {
-                Data = "Remove Friend"
+                Data = "Friend Removed"
             };
 
             return response;
