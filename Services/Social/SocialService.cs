@@ -20,12 +20,12 @@ namespace new_chess_server.Services.Social
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<ServiceResponse<SearchDetailsResultDto>> SearchDetailWithSocialId(GetSearchWithSocialIdDto getSearchWithSocialIdDto)
+        public async Task<ServiceResponse<SearchDetailsResultDto>> SearchDetailWithSocialId(string socialId)
         {
             var response = new ServiceResponse<SearchDetailsResultDto>();
 
             // Search for target user detail
-            var result = await _dataContext.Users.FirstOrDefaultAsync(user => user.SocialId == getSearchWithSocialIdDto.SocialId);
+            var result = await _dataContext.Users.FirstOrDefaultAsync(user => user.SocialId == socialId);
 
             if (result is null)
             {
@@ -44,10 +44,10 @@ namespace new_chess_server.Services.Social
             return response;
         }
 
-        public async Task<ServiceResponse<SearchWithSocialIdResultDto>> SearchWithSocialId(GetSearchWithSocialIdDto getSearchWithSocialIdDto)
+        public async Task<ServiceResponse<SearchWithSocialIdResultDto>> SearchWithSocialId(string socialId)
         {
             var response = new ServiceResponse<SearchWithSocialIdResultDto>();
-            var result = await _dataContext.Users.FirstOrDefaultAsync(user => user.SocialId == getSearchWithSocialIdDto.SocialId);
+            var result = await _dataContext.Users.FirstOrDefaultAsync(user => user.SocialId == socialId);
 
             if (result is not null)
             {
@@ -178,6 +178,7 @@ namespace new_chess_server.Services.Social
                 if (friendRequestA is not null)
                 {
                     response.Data.IsRequestSender = true;
+                    response.Data.FriendRequestId = friendRequestA.Id;
                     return response;
                 }
 
@@ -188,6 +189,7 @@ namespace new_chess_server.Services.Social
                 if (friendRequestB is not null)
                 {
                     response.Data.IsRequestReceiver = true;
+                    response.Data.FriendRequestId = friendRequestB.Id;
                     return response;
                 }
             }

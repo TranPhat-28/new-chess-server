@@ -22,56 +22,39 @@ namespace new_chess_server.Controllers
             _socialService = socialService;
         }
 
-        [HttpPost("Search")]
-        public async Task<ActionResult<ServiceResponse<SearchWithSocialIdResultDto>>> SearchWithSocialId(GetSearchWithSocialIdDto getSearchWithSocialIdDto)
+        [HttpGet("Search/{socialId}")]
+        public async Task<ActionResult<ServiceResponse<SearchWithSocialIdResultDto>>> SearchWithSocialId(string socialId)
         {
-            if (getSearchWithSocialIdDto.SocialId == "")
+            try
             {
-                return BadRequest("Missing required field(s)");
+                var response = new ServiceResponse<SearchWithSocialIdResultDto>();
+                response = await _socialService.SearchWithSocialId(socialId);
+
+                return response;
             }
-            // Search
-            else
+            catch (Exception e)
             {
-                try
-                {
-                    var response = new ServiceResponse<SearchWithSocialIdResultDto>();
-                    response = await _socialService.SearchWithSocialId(getSearchWithSocialIdDto);
+                Console.WriteLine("[SocialController] " + e.Message);
 
-                    return response;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("[SocialController] " + e.Message);
-
-                    return StatusCode(500);
-                }
+                return StatusCode(500);
             }
         }
 
-        [HttpPost("Detail")]
-        public async Task<ActionResult<ServiceResponse<SearchDetailsResultDto>>> SearchDetailWithSocialId(GetSearchWithSocialIdDto getSearchWithSocialIdDto)
+        [HttpGet("Detail/{socialId}")]
+        public async Task<ActionResult<ServiceResponse<SearchDetailsResultDto>>> SearchDetailWithSocialId(string socialId)
         {
-            if (getSearchWithSocialIdDto.SocialId == "")
+            try
             {
-                return BadRequest("Missing required field(s)");
+                var response = new ServiceResponse<SearchDetailsResultDto>();
+                response = await _socialService.SearchDetailWithSocialId(socialId);
+                return response;
             }
-            // Search
-            else
+            catch (Exception e)
             {
-                try
-                {
-                    var response = new ServiceResponse<SearchDetailsResultDto>();
-                    response = await _socialService.SearchDetailWithSocialId(getSearchWithSocialIdDto);
-                    return response;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("[SocialController] " + e.Message);
+                Console.WriteLine("[SocialController] " + e.Message);
 
-                    return StatusCode(500);
-                }
+                return StatusCode(500);
             }
-
         }
 
         [HttpGet("Relationship/{socialId}")]
@@ -91,7 +74,7 @@ namespace new_chess_server.Controllers
             }
         }
 
-        [HttpPost("Request/Send")]
+        [HttpPost("Request")]
         public async Task<ActionResult<ServiceResponse<FriendRequest>>> SendFriendRequest(PostSendFriendRequestDto postSendFriendRequestDto)
         {
             if (postSendFriendRequestDto.SocialId == "")
