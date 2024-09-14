@@ -19,33 +19,33 @@ namespace new_chess_server.Controllers
             _dataContext = dataContext;
         }
 
-        [HttpGet("SendFriendRequest")]
-        public async Task<ActionResult<ServiceResponse<string>>> AddUser1And2AsFriend()
-        {
-            var response = new ServiceResponse<string>();
+        // [HttpGet("SendFriendRequest")]
+        // public async Task<ActionResult<ServiceResponse<string>>> AddUser1And2AsFriend()
+        // {
+        //     var response = new ServiceResponse<string>();
 
-            // User5 send friend request to user4
+        //     // User5 send friend request to user4
 
-            // User 1: Winston
-            User? user5 = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == 5);
-            // User 2: James
-            User? user4 = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == 4);
+        //     // User 1: Winston
+        //     User? user5 = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == 5);
+        //     // User 2: James
+        //     User? user4 = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == 4);
 
-            var newRequest = new FriendRequest
-            {
-                SenderId = 5,
-                ReceiverId = 4,
-            };
+        //     var newRequest = new FriendRequest
+        //     {
+        //         SenderId = 5,
+        //         ReceiverId = 4,
+        //     };
 
-            _dataContext.FriendRequests.Add(newRequest);
+        //     _dataContext.FriendRequests.Add(newRequest);
 
-            // Save changes
-            await _dataContext.SaveChangesAsync();
-            // Add 1 as 2 friend
+        //     // Save changes
+        //     await _dataContext.SaveChangesAsync();
+        //     // Add 1 as 2 friend
 
-            response.Data = "User5 has sent a friend request to user4";
+        //     response.Data = "User5 has sent a friend request to user4";
 
-            return response;
-        }
+        //     return response;
+        // }
     }
 }

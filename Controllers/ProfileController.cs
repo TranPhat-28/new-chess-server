@@ -21,7 +21,7 @@ namespace new_chess_server.Controllers
         }
 
         [Authorize]
-        [HttpGet("GetProfile")]
+        [HttpGet("Profile")]
         public async Task<ActionResult<ServiceResponse<UserProfileDto>>> GetUserProfile()
         {
             try
@@ -40,7 +40,7 @@ namespace new_chess_server.Controllers
         }
 
         [Authorize]
-        [HttpGet("GetStatistic")]
+        [HttpGet("Statistic")]
         public async Task<ActionResult<ServiceResponse<UserGameStatisticDto>>> GetUserGameStatistic()
         {
             try
