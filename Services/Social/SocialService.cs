@@ -61,13 +61,45 @@ namespace new_chess_server.Services.Social
             return response;
         }
 
-        public async Task<ServiceResponse<string>> SendFriendRequest()
+        public async Task<ServiceResponse<FriendRequest>> SendFriendRequest(PostSendFriendRequestDto postSendFriendRequestDto)
         {
-            var response = new ServiceResponse<string>
+            var response = new ServiceResponse<FriendRequest>();
+
+            // Authed User ID
+            var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            // Get the ID of the target
+            var target = await _dataContext.Users.FirstOrDefaultAsync(u => u.SocialId == postSendFriendRequestDto.SocialId);
+
+            // If target is null
+            if (target is null)
             {
-                Data = "Friend Request Sent"
+                throw new Exception("Cannot find target user");
+            }
+            var targetId = target.Id;
+
+            // Check for duplicate request
+            var duplicate = await _dataContext.FriendRequests.FirstOrDefaultAsync(r => r.SenderId == userId && r.ReceiverId == targetId);
+
+            if (duplicate is not null)
+            {
+                response.IsSuccess = false;
+                response.Message = "Friend request already sent";
+                return response;
+            }
+
+            // Create the new Friend request
+            FriendRequest friendRequest = new FriendRequest
+            {
+                SenderId = userId,
+                ReceiverId = targetId
             };
 
+            _dataContext.FriendRequests.Add(friendRequest);
+            await _dataContext.SaveChangesAsync();
+
+            // Response
+            response.Data = friendRequest;
+            response.Message = "Friend request has been sent";
             return response;
         }
 

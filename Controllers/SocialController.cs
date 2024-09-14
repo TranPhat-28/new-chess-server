@@ -92,27 +92,28 @@ namespace new_chess_server.Controllers
         }
 
         [HttpPost("Request/Send")]
-        public async Task<ActionResult<ServiceResponse<string>>> SendFriendRequest()
+        public async Task<ActionResult<ServiceResponse<FriendRequest>>> SendFriendRequest(PostSendFriendRequestDto postSendFriendRequestDto)
         {
-            // if ()
-            // {
-            //     return BadRequest("Missing required field(s)");
-            // }
-            // else
-            // {
-            try
+            if (postSendFriendRequestDto.SocialId == "")
             {
-                var response = new ServiceResponse<string>();
-                response = await _socialService.SendFriendRequest();
-                return response;
+                return BadRequest("Missing required field(s)");
             }
-            catch (Exception e)
+            // Search
+            else
             {
-                Console.WriteLine("[SocialController] " + e.Message);
+                try
+                {
+                    var response = new ServiceResponse<FriendRequest>();
+                    response = await _socialService.SendFriendRequest(postSendFriendRequestDto);
+                    return response;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("[SocialController] " + e.Message);
 
-                return StatusCode(500);
+                    return StatusCode(500);
+                }
             }
-            // }
         }
 
         [HttpPost("Request/Cancel")]

@@ -11,7 +11,7 @@ namespace new_chess_server.Services.Social
         Task<ServiceResponse<SearchWithSocialIdResultDto>> SearchWithSocialId(GetSearchWithSocialIdDto getSearchWithSocialIdDto);
         Task<ServiceResponse<SearchDetailsResultDto>> SearchDetailWithSocialId(GetSearchWithSocialIdDto getSearchWithSocialIdDto);
         Task<ServiceResponse<RelationshipResultDto>> GetRelationship(string socialId);
-        Task<ServiceResponse<string>> SendFriendRequest();
+        Task<ServiceResponse<FriendRequest>> SendFriendRequest(PostSendFriendRequestDto postSendFriendRequestDto);
         Task<ServiceResponse<string>> RemoveFriendRequest();
         Task<ServiceResponse<string>> AcceptFriendRequest();
         Task<ServiceResponse<string>> RemoveFriend();
