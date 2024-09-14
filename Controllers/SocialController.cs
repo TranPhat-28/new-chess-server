@@ -10,7 +10,7 @@ using new_chess_server.Services.Social;
 
 namespace new_chess_server.Controllers
 {
-    // [Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class SocialController : ControllerBase
@@ -99,19 +99,13 @@ namespace new_chess_server.Controllers
             }
         }
 
-        [HttpPost("Request/Cancel")]
-        public async Task<ActionResult<ServiceResponse<string>>> RemoveFriendRequest()
+        [HttpDelete("Request/{requestId}")]
+        public async Task<ActionResult<ServiceResponse<int>>> RemoveFriendRequest(int requestId)
         {
-            // if ()
-            // {
-            //     return BadRequest("Missing required field(s)");
-            // }
-            // else
-            // {
             try
             {
-                var response = new ServiceResponse<string>();
-                response = await _socialService.RemoveFriendRequest();
+                var response = new ServiceResponse<int>();
+                response = await _socialService.RemoveFriendRequest(requestId);
                 return response;
             }
             catch (Exception e)
@@ -120,7 +114,6 @@ namespace new_chess_server.Controllers
 
                 return StatusCode(500);
             }
-            // }
         }
 
         [HttpPost("Request/Accept")]

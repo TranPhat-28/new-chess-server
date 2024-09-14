@@ -103,13 +103,22 @@ namespace new_chess_server.Services.Social
             return response;
         }
 
-        public async Task<ServiceResponse<string>> RemoveFriendRequest()
+        public async Task<ServiceResponse<int>> RemoveFriendRequest(int requestId)
         {
-            var response = new ServiceResponse<string>
-            {
-                Data = "Friend Request Cancelled"
-            };
+            var response = new ServiceResponse<int>();
 
+            var request = await _dataContext.FriendRequests.FirstOrDefaultAsync(r => r.Id == requestId);
+
+            if (request is null)
+            {
+                throw new Exception("Cannot find friend request");
+            }
+
+            _dataContext.FriendRequests.Remove(request);
+            await _dataContext.SaveChangesAsync();
+
+            response.Data = request.Id;
+            response.Message = "Request has been cancelled";
             return response;
         }
 

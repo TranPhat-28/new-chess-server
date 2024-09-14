@@ -12,7 +12,7 @@ namespace new_chess_server.Services.Social
         Task<ServiceResponse<SearchDetailsResultDto>> SearchDetailWithSocialId(string socialId);
         Task<ServiceResponse<RelationshipResultDto>> GetRelationship(string socialId);
         Task<ServiceResponse<FriendRequest>> SendFriendRequest(PostSendFriendRequestDto postSendFriendRequestDto);
-        Task<ServiceResponse<string>> RemoveFriendRequest();
+        Task<ServiceResponse<int>> RemoveFriendRequest(int requestId);
         Task<ServiceResponse<string>> AcceptFriendRequest();
         Task<ServiceResponse<string>> RemoveFriend();
     }
