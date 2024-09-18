@@ -116,19 +116,13 @@ namespace new_chess_server.Controllers
             }
         }
 
-        [HttpPost("Request/Accept")]
-        public async Task<ActionResult<ServiceResponse<string>>> AcceptFriendRequest()
+        [HttpPut("Request/{requestId}/Accept")]
+        public async Task<ActionResult<ServiceResponse<string>>> AcceptFriendRequest(int requestId)
         {
-            // if ()
-            // {
-            //     return BadRequest("Missing required field(s)");
-            // }
-            // else
-            // {
             try
             {
                 var response = new ServiceResponse<string>();
-                response = await _socialService.AcceptFriendRequest();
+                response = await _socialService.AcceptFriendRequest(requestId);
                 return response;
             }
             catch (Exception e)

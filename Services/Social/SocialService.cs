@@ -30,7 +30,7 @@ namespace new_chess_server.Services.Social
             if (result is null)
             {
                 response.IsSuccess = false;
-                response.Message = "Cannot find user information";
+                response.Message = "Cannot find player information";
             }
             else
             {
@@ -122,12 +122,38 @@ namespace new_chess_server.Services.Social
             return response;
         }
 
-        public async Task<ServiceResponse<string>> AcceptFriendRequest()
+        public async Task<ServiceResponse<string>> AcceptFriendRequest(int requestId)
         {
-            var response = new ServiceResponse<string>
+            var response = new ServiceResponse<string>();
+
+            // Get the request from db
+            var request = await _dataContext.FriendRequests.FirstOrDefaultAsync(r => r.Id == requestId);
+
+            // If reuqest is null
+            if (request is null)
             {
-                Data = "Friend Request Accepted"
-            };
+                throw new Exception("Cannot find friend request");
+            }
+
+            // Get the sender and receiver
+            var sender = await _dataContext.Users.FirstOrDefaultAsync(s => s.Id == request.SenderId);
+            var receiver = await _dataContext.Users.FirstOrDefaultAsync(r => r.Id == request.ReceiverId);
+
+            if (sender is null || receiver is null)
+            {
+                throw new Exception("Cannot add undefined player as friend");
+            }
+
+            // Perform add friend
+            sender.FriendList.Add(receiver);
+            receiver.FriendList.Add(sender);
+
+            // Then remove the friend request
+            _dataContext.FriendRequests.Remove(request);
+
+            await _dataContext.SaveChangesAsync();
+
+            response.Message = "Player has been added as friend";
 
             return response;
         }

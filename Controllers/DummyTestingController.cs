@@ -19,31 +19,23 @@ namespace new_chess_server.Controllers
             _dataContext = dataContext;
         }
 
-        // [HttpGet("SendFriendRequest")]
-        // public async Task<ActionResult<ServiceResponse<string>>> AddUser1And2AsFriend()
+        // [HttpGet("Dummy")]
+        // public async Task<ActionResult<ServiceResponse<string>>> Dummy()
         // {
         //     var response = new ServiceResponse<string>();
 
-        //     // User5 send friend request to user4
-
         //     // User 1: Winston
-        //     User? user5 = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == 5);
+        //     User? user1 = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == 1);
         //     // User 2: James
-        //     User? user4 = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == 4);
+        //     User? user2 = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == 2);
 
-        //     var newRequest = new FriendRequest
-        //     {
-        //         SenderId = 5,
-        //         ReceiverId = 4,
-        //     };
-
-        //     _dataContext.FriendRequests.Add(newRequest);
+        //     user1!.FriendList.Remove(user2!);
+        //     user2!.FriendList.Remove(user1!);
 
         //     // Save changes
         //     await _dataContext.SaveChangesAsync();
-        //     // Add 1 as 2 friend
 
-        //     response.Data = "User5 has sent a friend request to user4";
+        //     response.Data = "OK";
 
         //     return response;
         // }
