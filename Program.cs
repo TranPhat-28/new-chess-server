@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using new_chess_server.Services.Profile;
 using new_chess_server.Services.Social;
+using new_chess_server.Services.Friends;
 
 // Enable CORS
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -53,6 +54,7 @@ builder.Services.AddScoped<IOAuthService, OAuthService>();
 builder.Services.AddScoped<IProfileSerivce, ProfileService>();
 builder.Services.AddSingleton<IQuickPlayHandlerService, QuickPlayHandlerService>();
 builder.Services.AddScoped<ISocialService, SocialService>();
+builder.Services.AddScoped<IFriendsService, FriendsService>();
 
 // -----------CHANGE FOR DEPLOYMENT----------------
 // JWT Secret
