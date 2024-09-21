@@ -77,6 +77,13 @@ namespace new_chess_server.Services.Social
             }
             var targetId = target.Id;
 
+            // Check if already friend
+            bool isFriend = await IsFriend(userId, targetId);
+            if (isFriend == true)
+            {
+                throw new Exception("This player is already your friend");
+            }
+
             // Check for duplicate request
             var duplicate = await _dataContext.FriendRequests.FirstOrDefaultAsync(r => r.SenderId == userId && r.ReceiverId == targetId);
 
@@ -229,6 +236,22 @@ namespace new_chess_server.Services.Social
                 }
             }
             return response;
+        }
+
+        public async Task<bool> IsFriend(int userId, int targetId)
+        {
+            var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+
+            var target = user!.FriendList.FirstOrDefault(t => t.Id == targetId);
+
+            if (target is null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }
