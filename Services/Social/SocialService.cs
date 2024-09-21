@@ -165,12 +165,29 @@ namespace new_chess_server.Services.Social
             return response;
         }
 
-        public async Task<ServiceResponse<string>> RemoveFriend()
+        public async Task<ServiceResponse<string>> RemoveFriend(string socialId)
         {
-            var response = new ServiceResponse<string>
+            var response = new ServiceResponse<string>();
+
+            // Authed User ID
+            var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            // Get both user
+            var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var target = await _dataContext.Users.FirstOrDefaultAsync(t => t.SocialId == socialId);
+
+            if (user is null || target is null)
             {
-                Data = "Friend Removed"
-            };
+                throw new Exception("Cannot find user");
+            }
+
+            user.FriendList.Remove(target);
+            target.FriendList.Remove(user);
+
+            await _dataContext.SaveChangesAsync();
+
+            response.Data = socialId;
+            response.Message = "Friend removed successfully";
 
             return response;
         }

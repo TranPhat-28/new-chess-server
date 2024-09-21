@@ -134,19 +134,13 @@ namespace new_chess_server.Controllers
             // }
         }
 
-        [HttpDelete("Friend")]
-        public async Task<ActionResult<ServiceResponse<string>>> RemoveFriend()
+        [HttpDelete("Friend/{socialId}")]
+        public async Task<ActionResult<ServiceResponse<string>>> RemoveFriend(string socialId)
         {
-            // if ()
-            // {
-            //     return BadRequest("Missing required field(s)");
-            // }
-            // else
-            // {
             try
             {
                 var response = new ServiceResponse<string>();
-                response = await _socialService.RemoveFriend();
+                response = await _socialService.RemoveFriend(socialId);
                 return response;
             }
             catch (Exception e)
@@ -155,7 +149,6 @@ namespace new_chess_server.Controllers
 
                 return StatusCode(500);
             }
-            // }
         }
     }
 }
