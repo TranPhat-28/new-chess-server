@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using new_chess_server.Data;
 using new_chess_server.DTOs.SocialDTO;
+using new_chess_server.DTOs.UserProfileDTO;
 
 namespace new_chess_server.Services.Social
 {
@@ -22,25 +23,37 @@ namespace new_chess_server.Services.Social
 
         public async Task<ServiceResponse<SearchDetailsResultDto>> SearchDetailWithSocialId(string socialId)
         {
+            // Authed User ID
+            var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var response = new ServiceResponse<SearchDetailsResultDto>();
+            var responseData = new SearchDetailsResultDto();
 
-            // Search for target user detail
-            var result = await _dataContext.Users.FirstOrDefaultAsync(user => user.SocialId == socialId);
+            // Get detail information
+            var target = await _dataContext.Users.FirstOrDefaultAsync(u => u.SocialId == socialId);
 
-            if (result is null)
+            if (target is null)
             {
-                response.IsSuccess = false;
-                response.Message = "Cannot find player information";
+                throw new Exception("Cannot find player");
+            }
+
+            // Get friend status
+            var isFriend = await IsFriend(userId, target.Id);
+
+            // Social actions status
+            if (isFriend == true)
+            {
+                responseData.FriendRequestAction = null;
             }
             else
             {
-                response.Data = new SearchDetailsResultDto
-                {
-                    Name = result.Name,
-                    Picture = result.Picture,
-                };
+                responseData.FriendRequestAction = await GetFriendRequestActionState(userId, target.Id);
             }
 
+            responseData.Name = target.Name;
+            responseData.Picture = target.Picture;
+            responseData.IsFriend = isFriend;
+
+            response.Data = responseData;
             return response;
         }
 
@@ -192,82 +205,34 @@ namespace new_chess_server.Services.Social
             return response;
         }
 
-        public async Task<ServiceResponse<RelationshipResultDto>> GetRelationship(string socialId)
-        {
-            var response = new ServiceResponse<RelationshipResultDto>
-            {
-                Data = new RelationshipResultDto()
-            };
-
-            // Authed User ID
-            var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-            // CHECK FOR IS FRIEND RELATIONSHIP
-            // Search for friend status with current user
-            var userData = await _dataContext.Users.Include(u => u.FriendList).FirstOrDefaultAsync(u => u.Id == userId);
-
-            // Look for friend status with target search
-            if (userData!.FriendList is null)
-            {
-                response.Data!.IsFriend = false;
-            }
-            else
-            {
-                var friendStatus = userData!.FriendList.FirstOrDefault(f => f.SocialId == socialId);
-
-                if (friendStatus is null)
-                {
-                    response.Data!.IsFriend = false;
-                }
-                else
-                {
-                    response.Data!.IsFriend = true;
-                }
-            }
-
-            // CHECK FOR FRIEND REQUEST STATUS (only if not friend yet)
-            if (response.Data.IsFriend == false)
-            {
-                var target = await _dataContext.Users.FirstOrDefaultAsync(u => u.SocialId == socialId);
-
-                // Sender: User
-                // Receiver: Target
-                var friendRequestA = await _dataContext.FriendRequests.FirstOrDefaultAsync(r => r.SenderId == userId && r.ReceiverId == target!.Id);
-
-                if (friendRequestA is not null)
-                {
-                    response.Data.IsRequestSender = true;
-                    response.Data.FriendRequestId = friendRequestA.Id;
-                    return response;
-                }
-
-                // Sender: Target
-                // Receiver: User
-                var friendRequestB = await _dataContext.FriendRequests.FirstOrDefaultAsync(r => r.SenderId == target!.Id && r.ReceiverId == userId);
-
-                if (friendRequestB is not null)
-                {
-                    response.Data.IsRequestReceiver = true;
-                    response.Data.FriendRequestId = friendRequestB.Id;
-                    return response;
-                }
-            }
-            return response;
-        }
-
         public async Task<bool> IsFriend(int userId, int targetId)
         {
             var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
-            var target = user!.FriendList.FirstOrDefault(t => t.Id == targetId);
+            return user!.FriendList.Any(t => t.Id == targetId);
+        }
 
-            if (target is null)
+        private async Task<FriendRequestActionDto?> GetFriendRequestActionState(int userId, int targetId)
+        {
+            var request = await _dataContext.FriendRequests.FirstOrDefaultAsync(req =>
+                (req.SenderId == userId && req.ReceiverId == targetId) ||
+                (req.SenderId == targetId && req.ReceiverId == userId)
+            );
+
+            if (request is null)
             {
-                return false;
+                return null;
             }
             else
             {
-                return true;
+                var response = new FriendRequestActionDto
+                {
+                    FriendRequestId = request.Id,
+                    IsSender = request.SenderId == userId,
+                    IsReceiver = request.ReceiverId == userId
+                };
+
+                return response;
             }
         }
     }
