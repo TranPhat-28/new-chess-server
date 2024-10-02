@@ -33,7 +33,9 @@ namespace new_chess_server.Services.Social
 
             if (target is null)
             {
-                throw new Exception("Cannot find player");
+                response.IsSuccess = false;
+                response.Message = "Cannot find player";
+                return response;
             }
 
             // Get friend status
