@@ -7,6 +7,6 @@ namespace new_chess_server.DTOs.SocialDTO
 {
     public class PostSendFriendRequestDto
     {
-        public string SocialId { get; set; } = "";
+        public int Id { get; set; } = -1;
     }
 }

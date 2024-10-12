@@ -51,6 +51,7 @@ namespace new_chess_server.Services.Social
                 responseData.FriendRequestAction = await GetFriendRequestActionState(userId, target.Id);
             }
 
+            responseData.Id = target.Id;
             responseData.Name = target.Name;
             responseData.Picture = target.Picture;
             responseData.IsFriend = isFriend;
@@ -82,13 +83,16 @@ namespace new_chess_server.Services.Social
 
             // Authed User ID
             var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            // Get the ID of the target
-            var target = await _dataContext.Users.FirstOrDefaultAsync(u => u.SocialId == postSendFriendRequestDto.SocialId);
+
+            // Get target
+            var target = await _dataContext.Users.FirstOrDefaultAsync(t => t.Id == postSendFriendRequestDto.Id);
 
             // If target is null
             if (target is null)
             {
-                throw new Exception("Cannot find target user");
+                response.Message = "Cannot find target player";
+                response.IsSuccess = false;
+                return response;
             }
             var targetId = target.Id;
 
@@ -96,7 +100,9 @@ namespace new_chess_server.Services.Social
             bool isFriend = await IsFriend(userId, targetId);
             if (isFriend == true)
             {
-                throw new Exception("This player is already your friend");
+                response.Message = "This player is already your friend";
+                response.IsSuccess = false;
+                return response;
             }
 
             // Check for duplicate request

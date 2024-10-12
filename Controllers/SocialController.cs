@@ -60,7 +60,7 @@ namespace new_chess_server.Controllers
         [HttpPost("Request")]
         public async Task<ActionResult<ServiceResponse<FriendRequest>>> SendFriendRequest(PostSendFriendRequestDto postSendFriendRequestDto)
         {
-            if (postSendFriendRequestDto.SocialId == "")
+            if (postSendFriendRequestDto.Id == -1)
             {
                 return BadRequest("Missing required field(s)");
             }
