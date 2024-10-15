@@ -117,13 +117,13 @@ namespace new_chess_server.Controllers
             // }
         }
 
-        [HttpDelete("Friend/{socialId}")]
-        public async Task<ActionResult<ServiceResponse<string>>> RemoveFriend(string socialId)
+        [HttpDelete("Friend/{id}")]
+        public async Task<ActionResult<ServiceResponse<int>>> RemoveFriend(int id)
         {
             try
             {
-                var response = new ServiceResponse<string>();
-                response = await _socialService.RemoveFriend(socialId);
+                var response = new ServiceResponse<int>();
+                response = await _socialService.RemoveFriend(id);
                 return response;
             }
             catch (Exception e)

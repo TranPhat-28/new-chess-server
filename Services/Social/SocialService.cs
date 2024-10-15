@@ -186,16 +186,16 @@ namespace new_chess_server.Services.Social
             return response;
         }
 
-        public async Task<ServiceResponse<string>> RemoveFriend(string socialId)
+        public async Task<ServiceResponse<int>> RemoveFriend(int id)
         {
-            var response = new ServiceResponse<string>();
+            var response = new ServiceResponse<int>();
 
             // Authed User ID
             var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             // Get both user
             var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            var target = await _dataContext.Users.FirstOrDefaultAsync(t => t.SocialId == socialId);
+            var target = await _dataContext.Users.FirstOrDefaultAsync(t => t.Id == id);
 
             if (user is null || target is null)
             {
@@ -207,7 +207,7 @@ namespace new_chess_server.Services.Social
 
             await _dataContext.SaveChangesAsync();
 
-            response.Data = socialId;
+            response.Data = target.Id;
             response.Message = "Friend removed successfully";
 
             return response;
