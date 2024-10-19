@@ -45,5 +45,40 @@ namespace new_chess_server.Services.Friends
             response.Data = list.Select(f => _mapper.Map<FriendSummaryDetailDto>(f)).ToList();
             return response;
         }
+
+        public async Task<ServiceResponse<FriendDetailsDto>> GetFriendDetails(int id)
+        {
+            var response = new ServiceResponse<FriendDetailsDto>();
+
+            // Authed User ID
+            var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            // Get Authed User info
+            var user = await _dataContext.Users.Include(u => u.FriendList).FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user is null)
+            {
+                throw new Exception("Cannot find user");
+            }
+
+            var list = user.FriendList.ToList();
+
+            var target = list.FirstOrDefault(t => t.Id == id);
+
+            if (target is null)
+            {
+                throw new Exception("Cannot find target");
+            }
+
+            var data = new FriendDetailsDto
+            {
+                Id = target.Id,
+                Name = target.Name,
+                Picture = target.Picture
+            };
+
+            response.Data = data;
+            return response;
+        }
     }
 }

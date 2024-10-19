@@ -38,5 +38,23 @@ namespace new_chess_server.Controllers
                 return StatusCode(500);
             }
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ServiceResponse<FriendDetailsDto>>> GetFriendDetails(int id)
+        {
+            try
+            {
+                var response = new ServiceResponse<FriendDetailsDto>();
+                response = await _friendsService.GetFriendDetails(id);
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[FriendsController] " + e.Message);
+
+                return StatusCode(500);
+            }
+        }
     }
 }

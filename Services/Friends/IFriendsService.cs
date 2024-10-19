@@ -9,5 +9,6 @@ namespace new_chess_server.Services.Friends
     public interface IFriendsService
     {
         Task<ServiceResponse<List<FriendSummaryDetailDto>>> GetFriendList();
+        Task<ServiceResponse<FriendDetailsDto>> GetFriendDetails(int id);
     }
 }
