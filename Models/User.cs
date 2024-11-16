@@ -16,6 +16,6 @@ namespace new_chess_server.Models
         public string DateJoined { get; set; } = DateTime.Now.ToString("dd/MM/yyyy");
         public string SocialId { get; set; } = "";
         public GameStatistic? Statistic { get; set; }
-        public List<User> FriendList { get; set; } = new List<User>();
+        public List<User> Friends { get; set; } = new List<User>();
     }
 }

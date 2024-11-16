@@ -27,7 +27,7 @@ namespace new_chess_server.Services.Friends
             // Authed User ID
             var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var user = await _dataContext.Users.Include(u => u.FriendList).FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _dataContext.Users.Include(u => u.Friends).FirstOrDefaultAsync(u => u.Id == userId);
 
 
             if (user is null)
@@ -35,12 +35,12 @@ namespace new_chess_server.Services.Friends
                 throw new Exception("Cannot find user");
             }
 
-            if (user.FriendList is null)
+            if (user.Friends is null)
             {
                 return response;
             }
 
-            var list = user.FriendList;
+            var list = user.Friends;
 
             response.Data = list.Select(f => _mapper.Map<FriendSummaryDetailDto>(f)).ToList();
             return response;
@@ -54,14 +54,14 @@ namespace new_chess_server.Services.Friends
             var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             // Get Authed User info
-            var user = await _dataContext.Users.Include(u => u.FriendList).FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _dataContext.Users.Include(u => u.Friends).FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user is null)
             {
                 throw new Exception("Cannot find user");
             }
 
-            var list = user.FriendList.ToList();
+            var list = user.Friends.ToList();
 
             var target = list.FirstOrDefault(t => t.Id == id);
 

@@ -16,5 +16,17 @@ namespace new_chess_server.Data
         public DbSet<User> Users => Set<User>();
         public DbSet<GameStatistic> GameStatistics => Set<GameStatistic>();
         public DbSet<FriendRequest> FriendRequests => Set<FriendRequest>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.Friends)
+                .WithMany()
+                .UsingEntity<Dictionary<string, object>>(
+                    "UsersFriends",  // Name of the join table
+                    j => j.HasOne<User>().WithMany().HasForeignKey("UserId"),  // Foreign key for the first user
+                    j => j.HasOne<User>().WithMany().HasForeignKey("FriendId")  // Foreign key for the second user
+                );
+        }
     }
 }

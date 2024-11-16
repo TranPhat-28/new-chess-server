@@ -173,8 +173,8 @@ namespace new_chess_server.Services.Social
             }
 
             // Perform add friend
-            sender.FriendList.Add(receiver);
-            receiver.FriendList.Add(sender);
+            sender.Friends.Add(receiver);
+            receiver.Friends.Add(sender);
 
             // Then remove the friend request
             _dataContext.FriendRequests.Remove(request);
@@ -202,8 +202,8 @@ namespace new_chess_server.Services.Social
                 throw new Exception("Cannot find user");
             }
 
-            user.FriendList.Remove(target);
-            target.FriendList.Remove(user);
+            user.Friends.Remove(target);
+            target.Friends.Remove(user);
 
             await _dataContext.SaveChangesAsync();
 
@@ -217,7 +217,7 @@ namespace new_chess_server.Services.Social
         {
             var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
 
-            return user!.FriendList.Any(t => t.Id == targetId);
+            return user!.Friends.Any(t => t.Id == targetId);
         }
 
         private async Task<FriendRequestActionDto?> GetFriendRequestActionState(int userId, int targetId)
