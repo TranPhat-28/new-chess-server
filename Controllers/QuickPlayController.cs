@@ -36,7 +36,7 @@ namespace new_chess_server.Controllers
         }
 
         [HttpPost("Move")]
-        public ActionResult<ServiceResponse<ResponseMoveDto>> Move(RequestInputMoveDto requestInputMoveDto)
+        public async Task<ActionResult<ServiceResponse<ResponseMoveDto>>> Move(RequestInputMoveDto requestInputMoveDto)
         {
             if (requestInputMoveDto.Fen == "")
             {
@@ -52,7 +52,7 @@ namespace new_chess_server.Controllers
                 try
                 {
                     var response = new ServiceResponse<ResponseMoveDto>();
-                    response = _quickPlayHandlerService.Move(requestInputMoveDto);
+                    response = await _quickPlayHandlerService.Move(requestInputMoveDto);
 
                     return response;
                 }

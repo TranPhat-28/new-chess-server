@@ -14,10 +14,11 @@ namespace new_chess_server.Stockfish
         {
             process.StartInfo = new ProcessStartInfo
             {
+                // -----------CHANGE FOR DEPLOYMENT----------------
                 // Window Stockfish
-                // FileName = $@"{System.IO.Directory.GetCurrentDirectory().ToString()}\Stockfish\stockfish.exe",
+                FileName = $@"{System.IO.Directory.GetCurrentDirectory().ToString()}\Stockfish\stockfish.exe",
                 // Docker - Ubuntu Stockfish
-                FileName = @"/App/Stockfish/stockfish-ubuntu",
+                // FileName = @"/App/Stockfish/stockfish-ubuntu",
                 UseShellExecute = false,
                 RedirectStandardError = true,
                 RedirectStandardInput = true,
