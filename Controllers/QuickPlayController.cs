@@ -35,34 +35,40 @@ namespace new_chess_server.Controllers
             return response;
         }
 
-        [HttpPost("Move")]
-        public async Task<ActionResult<ServiceResponse<ResponseMoveDto>>> Move(RequestInputMoveDto requestInputMoveDto)
+        // [HttpPost("Move")]
+        // public async Task<ActionResult<ServiceResponse<ResponseMoveDto>>> Move(RequestInputMoveDto requestInputMoveDto)
+        // {
+        //     if (requestInputMoveDto.Fen == "")
+        //     {
+        //         return BadRequest("Missing required field(s)");
+        //     }
+        //     // Validate FEN string
+        //     else if (!FenIsValid(requestInputMoveDto.Fen))
+        //     {
+        //         return BadRequest("Invalid FEN string");
+        //     }
+        //     else
+        //     {
+        //         try
+        //         {
+        //             var response = new ServiceResponse<ResponseMoveDto>();
+        //             response = await _quickPlayHandlerService.Move(requestInputMoveDto);
+
+        //             return response;
+        //         }
+        //         catch (Exception e)
+        //         {
+        //             Console.WriteLine("[QuickPlayController] " + e.Message);
+
+        //             return StatusCode(500);
+        //         }
+        //     }
+        // }
+
+        [HttpGet("test")]
+        public ActionResult<string> Test()
         {
-            if (requestInputMoveDto.Fen == "")
-            {
-                return BadRequest("Missing required field(s)");
-            }
-            // Validate FEN string
-            else if (!FenIsValid(requestInputMoveDto.Fen))
-            {
-                return BadRequest("Invalid FEN string");
-            }
-            else
-            {
-                try
-                {
-                    var response = new ServiceResponse<ResponseMoveDto>();
-                    response = await _quickPlayHandlerService.Move(requestInputMoveDto);
-
-                    return response;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("[QuickPlayController] " + e.Message);
-
-                    return StatusCode(500);
-                }
-            }
+            return _quickPlayHandlerService.Test();
         }
 
         private static bool FenIsValid(string inputFen)

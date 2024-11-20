@@ -3,7 +3,6 @@ global using new_chess_server.Models.Enums;
 global using new_chess_server.DTOs.AuthenticationDTO;
 global using new_chess_server.Services.Authentication;
 global using Microsoft.EntityFrameworkCore;
-global using new_chess_server.Stockfish;
 global using System.Security.Claims;
 global using AutoMapper;
 using new_chess_server.Data;
@@ -14,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using new_chess_server.Services.Profile;
 using new_chess_server.Services.Social;
 using new_chess_server.Services.Friends;
+using new_chess_server.Services.Stockfish;
 
 // Enable CORS
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -52,9 +52,10 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IOAuthService, OAuthService>();
 builder.Services.AddScoped<IProfileSerivce, ProfileService>();
-builder.Services.AddSingleton<IQuickPlayHandlerService, QuickPlayHandlerService>();
+builder.Services.AddScoped<IQuickPlayHandlerService, QuickPlayHandlerService>();
 builder.Services.AddScoped<ISocialService, SocialService>();
 builder.Services.AddScoped<IFriendsService, FriendsService>();
+builder.Services.AddSingleton<IStockfishService, StockfishService>();
 
 // -----------CHANGE FOR DEPLOYMENT----------------
 // JWT Secret
