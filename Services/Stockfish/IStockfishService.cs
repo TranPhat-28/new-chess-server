@@ -7,6 +7,6 @@ namespace new_chess_server.Services.Stockfish
 {
     public interface IStockfishService
     {
-        void NewGame();
+        Task<string> NewGame();
     }
 }

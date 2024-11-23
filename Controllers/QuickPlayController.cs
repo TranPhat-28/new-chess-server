@@ -35,40 +35,42 @@ namespace new_chess_server.Controllers
             return response;
         }
 
-        // [HttpPost("Move")]
-        // public async Task<ActionResult<ServiceResponse<ResponseMoveDto>>> Move(RequestInputMoveDto requestInputMoveDto)
-        // {
-        //     if (requestInputMoveDto.Fen == "")
-        //     {
-        //         return BadRequest("Missing required field(s)");
-        //     }
-        //     // Validate FEN string
-        //     else if (!FenIsValid(requestInputMoveDto.Fen))
-        //     {
-        //         return BadRequest("Invalid FEN string");
-        //     }
-        //     else
-        //     {
-        //         try
-        //         {
-        //             var response = new ServiceResponse<ResponseMoveDto>();
-        //             response = await _quickPlayHandlerService.Move(requestInputMoveDto);
-
-        //             return response;
-        //         }
-        //         catch (Exception e)
-        //         {
-        //             Console.WriteLine("[QuickPlayController] " + e.Message);
-
-        //             return StatusCode(500);
-        //         }
-        //     }
-        // }
-
-        [HttpGet("test")]
-        public ActionResult<string> Test()
+        [HttpPost("Move")]
+        public async Task<ActionResult<ServiceResponse<ResponseMoveDto>>> Move(RequestInputMoveDto requestInputMoveDto)
         {
-            return _quickPlayHandlerService.Test();
+            if (requestInputMoveDto.Fen == "")
+            {
+                return BadRequest("Missing required field(s)");
+            }
+            // Validate FEN string
+            else if (!FenIsValid(requestInputMoveDto.Fen))
+            {
+                return BadRequest("Invalid FEN string");
+            }
+            else
+            {
+                try
+                {
+                    var response = new ServiceResponse<ResponseMoveDto>();
+                    response = await _quickPlayHandlerService.Move(requestInputMoveDto);
+
+                    return response;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("[QuickPlayController] " + e.Message);
+
+                    return StatusCode(500);
+                }
+            }
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<ServiceResponse<string>>> Test()
+        {
+            var response = new ServiceResponse<string>();
+            response.Data = await _quickPlayHandlerService.Test();
+            return Ok(response);
         }
 
         private static bool FenIsValid(string inputFen)

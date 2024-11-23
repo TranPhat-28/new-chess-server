@@ -11,7 +11,6 @@ namespace new_chess_server.Services.Stockfish
     public class StockfishService : IStockfishService
     {
         private readonly Process process = new Process();
-        // private readonly ObservableCollection<string> output = new ObservableCollection<string>();
         public StockfishService()
         {
             process.StartInfo = new ProcessStartInfo
@@ -27,43 +26,56 @@ namespace new_chess_server.Services.Stockfish
                 RedirectStandardOutput = true
             };
 
-            ExpectOutput("Stockfish 16 by the Stockfish developers", "Stockfish started");
-
             // Start the process and listening to output
             process.Start();
             process.BeginOutputReadLine();
         }
 
+        // Public interface method
+        public async Task<string> NewGame()
+        {
+            ExecuteCommand("ucinewgame");
+            ExecuteCommand("isready");
+
+            string output = await ExpectOutput("readyok");
+            Console.WriteLine("[EXPECT]: " + output);
+            return output;
+        }
+
+        // Private method
         private void ExecuteCommand(string command)
         {
             process.StandardInput.WriteLine(command);
             process.StandardInput.Flush();
         }
 
-        public void NewGame()
+        private async Task<string> ExpectOutput(string expectedOutput)
         {
-            ExecuteCommand("ucinewgame");
-            ExecuteCommand("isready");
-
-            ExpectOutput("readyok", "Stockfish is ready");
-        }
-
-        private void ExpectOutput(string expectedOutput, string? logValue)
-        {
+            var tcs = new TaskCompletionSource<string>();
             DataReceivedEventHandler handler = null;
-            handler = new DataReceivedEventHandler((sender, e) =>
+            handler = (sender, e) =>
             {
-                if (e.Data is not null && e.Data.Trim().Contains(expectedOutput))
+                if (e.Data is not null && e.Data.Contains(expectedOutput))
                 {
-                    if (logValue is not null)
-                    {
-                        Console.WriteLine(logValue);
-                    }
-                    process.OutputDataReceived -= handler;
+                    tcs.TrySetResult(e.Data); // Signal the waiting task
+                    process.OutputDataReceived -= handler; // Unsubscribe from the event
                 }
-            });
+            };
 
             process.OutputDataReceived += handler;
+
+            // Add a timeout to avoid indefinite waiting
+            var timeoutTask = Task.Delay(5000);
+            var completedTask = await Task.WhenAny(tcs.Task, timeoutTask);
+
+            // Check if the timeout expired
+            if (completedTask == timeoutTask)
+            {
+                process.OutputDataReceived -= handler; // Clean up
+                throw new Exception($"[Stockfish] Expected output '{expectedOutput}' not received within 5000s.");
+            }
+
+            return await tcs.Task;
         }
     }
 }

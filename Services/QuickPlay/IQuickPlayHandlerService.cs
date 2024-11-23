@@ -8,8 +8,7 @@ namespace new_chess_server.Services.QuickPlay
 {
     public interface IQuickPlayHandlerService
     {
-        // Task<ServiceResponse<ResponseMoveDto>> Move(RequestInputMoveDto requestInputMoveDto);
-        // void InitStockfish();
-        string Test();
+        Task<ServiceResponse<ResponseMoveDto>> Move(RequestInputMoveDto requestInputMoveDto);
+        Task<string> Test();
     }
 }
