@@ -20,8 +20,8 @@ namespace new_chess_server.Controllers
             _quickPlayHandlerService = quickPlayHandlerService;
         }
 
-        [HttpGet("GetPlayerRandomId")]
-        public ActionResult<ServiceResponse<int>> GetPlayerRandomId()
+        [HttpGet("RandomId")]
+        public ActionResult<ServiceResponse<int>> GetRandomId()
         {
             Random rnd = new();
             // Random between 10000 and 99999
