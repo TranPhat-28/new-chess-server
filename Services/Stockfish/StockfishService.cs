@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using new_chess_server.DTOs.GameMoveDTO;
 
 namespace new_chess_server.Services.Stockfish
 {
@@ -38,10 +39,30 @@ namespace new_chess_server.Services.Stockfish
             ExecuteCommand("isready");
 
             string output = await ExpectOutput("readyok");
-            Console.WriteLine("[EXPECT]: " + output);
+            Console.WriteLine("[Stockfish Output]: " + output);
             return output;
         }
 
+        public async Task<string> GetStockfishMove(string fen)
+        {
+            ExecuteCommand($"position fen {fen}");
+            ExecuteCommand("go depth 5");
+
+            string output = await ExpectOutput("bestmove");
+            Console.WriteLine("[Stockfish Output]: " + output);
+
+            // Format output
+            string[] outputList = output.Trim().Split(" ");
+            int bestmoveIndex = Array.IndexOf(outputList, "bestmove");
+
+            if (bestmoveIndex == -1)
+            {
+                throw new Exception("Received wrong output from Stockfish");
+            }
+
+            string outputMove = outputList[bestmoveIndex + 1];
+            return outputMove;
+        }
         // Private method
         private void ExecuteCommand(string command)
         {

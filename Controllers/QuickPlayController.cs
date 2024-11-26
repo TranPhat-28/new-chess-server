@@ -65,14 +65,6 @@ namespace new_chess_server.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<ActionResult<ServiceResponse<string>>> Test()
-        {
-            var response = new ServiceResponse<string>();
-            response.Data = await _quickPlayHandlerService.Test();
-            return Ok(response);
-        }
-
         private static bool FenIsValid(string inputFen)
         {
             // Regular expression pattern for FEN validation
