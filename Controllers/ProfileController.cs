@@ -9,6 +9,7 @@ using new_chess_server.Services.Profile;
 
 namespace new_chess_server.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ProfileController : ControllerBase
@@ -20,7 +21,6 @@ namespace new_chess_server.Controllers
             _profileSerivce = profileSerivce;
         }
 
-        [Authorize]
         [HttpGet("Profile")]
         public async Task<ActionResult<ServiceResponse<UserProfileDto>>> GetUserProfile()
         {
@@ -39,7 +39,6 @@ namespace new_chess_server.Controllers
             }
         }
 
-        [Authorize]
         [HttpGet("Statistic")]
         public async Task<ActionResult<ServiceResponse<UserGameStatisticDto>>> GetUserGameStatistic()
         {
