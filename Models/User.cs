@@ -17,5 +17,6 @@ namespace new_chess_server.Models
         public string SocialId { get; set; } = "";
         public GameStatistic? Statistic { get; set; }
         public List<User> Friends { get; set; } = new List<User>();
+        public PracticeModeGameHistory? PracticeModeGameHistory { get; set; }
     }
 }
