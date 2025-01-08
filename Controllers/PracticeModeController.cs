@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using new_chess_server.DTOs.GameMoveDTO;
+using new_chess_server.DTOs.PracticeModeDTO;
 using new_chess_server.Services.PracticeMode;
 
 namespace new_chess_server.Controllers
@@ -22,14 +23,83 @@ namespace new_chess_server.Controllers
             _practiceModeService = practiceModeService;
         }
 
-        [HttpGet("Saved")]
-        public ActionResult<ServiceResponse<string>> GetPreviouslySavedGame()
+        [HttpGet]
+        public async Task<ActionResult<ServiceResponse<bool>>> CheckIfSavedGameExist()
         {
-            var response = new ServiceResponse<string>
+            try
             {
-                Data = "There is no saved game"
-            };
-            return response;
+                var response = new ServiceResponse<bool>();
+                response = await _practiceModeService.CheckIfSavedGameExist();
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[PracticeModeController] " + e.Message);
+
+                return StatusCode(500);
+            }
+        }
+
+        [HttpGet("Saved")]
+        public async Task<ActionResult<ServiceResponse<List<string>>>> GetSavedGameHistory()
+        {
+            try
+            {
+                var response = new ServiceResponse<List<string>>();
+                response = await _practiceModeService.GetSavedGameHistory();
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[PracticeModeController] " + e.Message);
+
+                return StatusCode(500);
+            }
+        }
+
+        [HttpDelete("Saved")]
+        public async Task<ActionResult<ServiceResponse<int>>> DeleteSavedGameHistory()
+        {
+            try
+            {
+                var response = new ServiceResponse<int>();
+                response = await _practiceModeService.DeleteSavedGameHistory();
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[PracticeModeController] " + e.Message);
+
+                return StatusCode(500);
+            }
+        }
+
+        [HttpPost("Saved")]
+        public async Task<ActionResult<ServiceResponse<int>>> UpdateSavedGameHistory(UpdateGameHistoryDto updateGameHistoryDto)
+        {
+            if (updateGameHistoryDto.Moves is null || updateGameHistoryDto.Moves.Count == 0)
+            {
+                return BadRequest("Missing required field(s)");
+            }
+            else
+            {
+                try
+                {
+                    var response = new ServiceResponse<int>();
+                    response = await _practiceModeService.UpdateSavedGameHistory(updateGameHistoryDto);
+
+                    return response;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("[PracticeModeController] " + e.Message);
+
+                    return StatusCode(500);
+                }
+            }
         }
 
         [HttpPost("Move")]

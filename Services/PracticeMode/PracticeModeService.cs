@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Chess;
+using new_chess_server.Data;
 using new_chess_server.DTOs.GameMoveDTO;
+using new_chess_server.DTOs.PracticeModeDTO;
 using new_chess_server.Services.Stockfish;
 
 namespace new_chess_server.Services.PracticeMode
@@ -11,12 +13,104 @@ namespace new_chess_server.Services.PracticeMode
     public class PracticeModeService : IPracticeModeService
     {
         private readonly IStockfishService _stockfish;
+        private readonly DataContext _dataContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private ChessBoard _board = new ChessBoard();
 
-        public PracticeModeService(IStockfishService stockfishService)
+        public PracticeModeService(IStockfishService stockfishService, DataContext dataContext, IHttpContextAccessor httpContextAccessor)
         {
             _stockfish = stockfishService;
+            _dataContext = dataContext;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        public async Task<ServiceResponse<bool>> CheckIfSavedGameExist()
+        {
+            var response = new ServiceResponse<bool>();
+
+            int userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var previousGame = await _dataContext.PracticeModeGameHistories.FirstOrDefaultAsync(game => game.UserId == userId);
+        
+            if (previousGame is null)
+            {
+                response.Data = false;
+            }
+            else
+            {
+                response.Data = true;
+            }
+            return response;
+        }
+
+        public async Task<ServiceResponse<List<string>>> GetSavedGameHistory()
+        {
+            var response = new ServiceResponse<List<string>>();
+
+            int userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var savedGame = await _dataContext.PracticeModeGameHistories.FirstOrDefaultAsync(game => game.UserId == userId);
+        
+            if (savedGame is null)
+            {
+                throw new Exception("Csnnot load saved game");
+            }
+            else
+            {
+                response.Data = savedGame.Moves;
+            }
+            return response;
+        }
+
+        public async Task<ServiceResponse<int>> DeleteSavedGameHistory()
+        {
+            var response = new ServiceResponse<int>();
+
+            int userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var savedGame = await _dataContext.PracticeModeGameHistories.FirstOrDefaultAsync(game => game.UserId == userId);
+            var user = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == userId);
+            
+            if (savedGame is null || user is null)
+            {
+                throw new Exception("Cannot delete saved game");
+            }
+            else
+            {
+                _dataContext.PracticeModeGameHistories.Remove(savedGame);
+                user.PracticeModeGameHistory = null;
+
+                await _dataContext.SaveChangesAsync();
+
+                response.Data = savedGame.Id;
+
+                return response;
+            }
+        }
+
+        public async Task<ServiceResponse<int>> UpdateSavedGameHistory(UpdateGameHistoryDto updateGameHistoryDto)
+        {
+            var response = new ServiceResponse<int>();
+
+            int userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var user = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == userId);
+
+            if (user is null)
+            {
+                throw new Exception("Cannot find user");
+            }
+
+            PracticeModeGameHistory newGame = new PracticeModeGameHistory {
+                Moves = updateGameHistoryDto.Moves,
+                User = user
+            };
+
+            user.PracticeModeGameHistory = newGame;
+
+            await _dataContext.SaveChangesAsync();
+
+            response.Data = newGame.Id;
+
+            return response;
+        }
+
         public async Task<ServiceResponse<ResponseMoveDto>> Move(RequestInputMoveDto requestInputMoveDto)
         {
             var response = new ServiceResponse<ResponseMoveDto>();
