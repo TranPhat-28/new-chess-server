@@ -8,8 +8,9 @@ namespace new_chess_server.Models
     public class PracticeModeGameHistory
     {
         public int Id { get; set; }
-        public List<string>? Moves { get; set; }
-        public User? User { get; set; }
+        public List<MoveHistoryItem> Moves { get; set; } = new List<MoveHistoryItem>();
+        // Require User
+        public User User { get; set; } = null!;
         public int UserId { get; set; }
     }
 }

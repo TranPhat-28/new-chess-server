@@ -69,8 +69,19 @@ namespace new_chess_server.Services.Authentication
                     // Establish the relationship from User to the GameStatistic
                     newUser.Statistic = newStatistic;
 
+                    // Create new Practice Mode History
+                    PracticeModeGameHistory newPracticeModeGameHistory = new PracticeModeGameHistory()
+                    {
+                        // Establish relationship to User
+                        User = newUser
+                    };
+
+                    // User - Practice relation
+                    newUser.PracticeModeGameHistory = newPracticeModeGameHistory;
+
                     _dataContext.Users.Add(newUser);
                     _dataContext.GameStatistics.Add(newStatistic);
+                    _dataContext.PracticeModeGameHistories.Add(newPracticeModeGameHistory);
 
                     await _dataContext.SaveChangesAsync();
 

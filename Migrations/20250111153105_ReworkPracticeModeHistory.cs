@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -7,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace new_chess_server.Migrations
 {
     /// <inheritdoc />
-    public partial class AddPracticeModeGameHistoryModel : Migration
+    public partial class ReworkPracticeModeHistory : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,7 +17,6 @@ namespace new_chess_server.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Moves = table.Column<List<string>>(type: "text[]", nullable: true),
                     UserId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -32,6 +30,32 @@ namespace new_chess_server.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "MoveHistoryItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Side = table.Column<string>(type: "text", nullable: false),
+                    Move = table.Column<string>(type: "text", nullable: false),
+                    PracticeModeGameHistoryId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MoveHistoryItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MoveHistoryItems_PracticeModeGameHistories_PracticeModeGame~",
+                        column: x => x.PracticeModeGameHistoryId,
+                        principalTable: "PracticeModeGameHistories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MoveHistoryItems_PracticeModeGameHistoryId",
+                table: "MoveHistoryItems",
+                column: "PracticeModeGameHistoryId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_PracticeModeGameHistories_UserId",
                 table: "PracticeModeGameHistories",
@@ -42,6 +66,9 @@ namespace new_chess_server.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "MoveHistoryItems");
+
             migrationBuilder.DropTable(
                 name: "PracticeModeGameHistories");
         }
