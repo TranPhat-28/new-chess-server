@@ -11,7 +11,7 @@ namespace new_chess_server.Services.PracticeMode
     {
         Task<ServiceResponse<ResponseMoveDto>> Move(RequestInputMoveDto requestInputMoveDto);
         Task<ServiceResponse<bool>> CheckIfSavedGameExist();
-        Task<ServiceResponse<List<string>>> GetSavedGameHistory();
+        Task<ServiceResponse<List<MoveHistoryItem>>> GetSavedGameHistory();
         Task<ServiceResponse<int>> DeleteSavedGameHistory();
         Task<ServiceResponse<int>> UpdateSavedGameHistory(UpdateGameHistoryDto updateGameHistoryDto);
     }

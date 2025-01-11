@@ -17,6 +17,7 @@ namespace new_chess_server.Data
         public DbSet<GameStatistic> GameStatistics => Set<GameStatistic>();
         public DbSet<FriendRequest> FriendRequests => Set<FriendRequest>();
         public DbSet<PracticeModeGameHistory> PracticeModeGameHistories => Set<PracticeModeGameHistory>();
+        public DbSet<MoveHistoryItem> MoveHistoryItems => Set<MoveHistoryItem>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

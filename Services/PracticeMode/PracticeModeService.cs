@@ -15,13 +15,15 @@ namespace new_chess_server.Services.PracticeMode
         private readonly IStockfishService _stockfish;
         private readonly DataContext _dataContext;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMapper _mapper;
         private ChessBoard _board = new ChessBoard();
 
-        public PracticeModeService(IStockfishService stockfishService, DataContext dataContext, IHttpContextAccessor httpContextAccessor)
+        public PracticeModeService(IStockfishService stockfishService, DataContext dataContext, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             _stockfish = stockfishService;
             _dataContext = dataContext;
             _httpContextAccessor = httpContextAccessor;
+            _mapper = mapper;
         }
 
         public async Task<ServiceResponse<bool>> CheckIfSavedGameExist()
@@ -29,26 +31,37 @@ namespace new_chess_server.Services.PracticeMode
             var response = new ServiceResponse<bool>();
 
             int userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var previousGame = await _dataContext.PracticeModeGameHistories.FirstOrDefaultAsync(game => game.UserId == userId);
-        
+            var previousGame = await _dataContext.PracticeModeGameHistories
+                .Include(game => game.Moves)
+                .FirstOrDefaultAsync(game => game.UserId == userId);
+
             if (previousGame is null)
             {
-                response.Data = false;
+                throw new Exception("Cannot load your data now");
             }
             else
             {
-                response.Data = true;
+                if (previousGame.Moves.Count == 0)
+                {
+                    response.Data = false;
+                    response.Message = "No saved game found";
+                }
+                else
+                {
+                    response.Data = true;
+                    response.Message = "Saved game found";
+                }
             }
             return response;
         }
 
-        public async Task<ServiceResponse<List<string>>> GetSavedGameHistory()
+        public async Task<ServiceResponse<List<MoveHistoryItem>>> GetSavedGameHistory()
         {
-            var response = new ServiceResponse<List<string>>();
+            var response = new ServiceResponse<List<MoveHistoryItem>>();
 
             int userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var savedGame = await _dataContext.PracticeModeGameHistories.FirstOrDefaultAsync(game => game.UserId == userId);
-        
+
             if (savedGame is null)
             {
                 throw new Exception("Csnnot load saved game");
@@ -67,7 +80,7 @@ namespace new_chess_server.Services.PracticeMode
             int userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var savedGame = await _dataContext.PracticeModeGameHistories.FirstOrDefaultAsync(game => game.UserId == userId);
             var user = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == userId);
-            
+
             if (savedGame is null || user is null)
             {
                 throw new Exception("Cannot delete saved game");
@@ -90,23 +103,28 @@ namespace new_chess_server.Services.PracticeMode
             var response = new ServiceResponse<int>();
 
             int userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var user = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == userId);
+            var gameHistory = await _dataContext.PracticeModeGameHistories.FirstOrDefaultAsync(history => history.UserId == userId);
 
-            if (user is null)
+            if (gameHistory is null)
             {
-                throw new Exception("Cannot find user");
+                throw new Exception("Cannot find your data");
             }
 
-            PracticeModeGameHistory newGame = new PracticeModeGameHistory {
-                Moves = updateGameHistoryDto.Moves,
-                User = user
-            };
+            // Map to model
+            var newMovesList = _mapper.Map<List<MoveHistoryItemDto>, List<MoveHistoryItem>>(updateGameHistoryDto.Moves);
+            foreach (var move in newMovesList)
+            {
+                move.PracticeModeGameHistoryId = gameHistory.Id; // Set the foreign key
+                move.practiceModeGameHistory = gameHistory;      // Set navigation property (optional)
+            }
 
-            user.PracticeModeGameHistory = newGame;
+            // Insert all moves            
+            gameHistory.Moves = newMovesList;
 
             await _dataContext.SaveChangesAsync();
 
-            response.Data = newGame.Id;
+            response.Data = gameHistory.Id;
+            response.Message = "Your game has been saved";
 
             return response;
         }

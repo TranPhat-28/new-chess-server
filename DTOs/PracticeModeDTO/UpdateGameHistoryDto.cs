@@ -7,6 +7,6 @@ namespace new_chess_server.DTOs.PracticeModeDTO
 {
     public class UpdateGameHistoryDto
     {
-        public List<string>? Moves { get; set; }
+        public List<MoveHistoryItemDto> Moves { get; set; } = new List<MoveHistoryItemDto>();
     }
 }

@@ -23,6 +23,7 @@ namespace new_chess_server.Controllers
             _practiceModeService = practiceModeService;
         }
 
+        // FINISHED
         [HttpGet]
         public async Task<ActionResult<ServiceResponse<bool>>> CheckIfSavedGameExist()
         {
@@ -41,42 +42,43 @@ namespace new_chess_server.Controllers
             }
         }
 
-        [HttpGet("Saved")]
-        public async Task<ActionResult<ServiceResponse<List<string>>>> GetSavedGameHistory()
-        {
-            try
-            {
-                var response = new ServiceResponse<List<string>>();
-                response = await _practiceModeService.GetSavedGameHistory();
+        // [HttpGet("Saved")]
+        // public async Task<ActionResult<ServiceResponse<List<MoveHistoryItem>>>> GetSavedGameHistory()
+        // {
+        //     try
+        //     {
+        //         var response = new ServiceResponse<List<MoveHistoryItem>>();
+        //         response = await _practiceModeService.GetSavedGameHistory();
 
-                return response;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("[PracticeModeController] " + e.Message);
+        //         return response;
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         Console.WriteLine("[PracticeModeController] " + e.Message);
 
-                return StatusCode(500);
-            }
-        }
+        //         return StatusCode(500);
+        //     }
+        // }
 
-        [HttpDelete("Saved")]
-        public async Task<ActionResult<ServiceResponse<int>>> DeleteSavedGameHistory()
-        {
-            try
-            {
-                var response = new ServiceResponse<int>();
-                response = await _practiceModeService.DeleteSavedGameHistory();
+        // [HttpDelete("Saved")]
+        // public async Task<ActionResult<ServiceResponse<int>>> DeleteSavedGameHistory()
+        // {
+        //     try
+        //     {
+        //         var response = new ServiceResponse<int>();
+        //         response = await _practiceModeService.DeleteSavedGameHistory();
 
-                return response;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("[PracticeModeController] " + e.Message);
+        //         return response;
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         Console.WriteLine("[PracticeModeController] " + e.Message);
 
-                return StatusCode(500);
-            }
-        }
+        //         return StatusCode(500);
+        //     }
+        // }
 
+        // FINISHED
         [HttpPost("Saved")]
         public async Task<ActionResult<ServiceResponse<int>>> UpdateSavedGameHistory(UpdateGameHistoryDto updateGameHistoryDto)
         {
