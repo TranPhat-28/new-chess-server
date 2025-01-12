@@ -60,23 +60,24 @@ namespace new_chess_server.Controllers
         //     }
         // }
 
-        // [HttpDelete("Saved")]
-        // public async Task<ActionResult<ServiceResponse<int>>> DeleteSavedGameHistory()
-        // {
-        //     try
-        //     {
-        //         var response = new ServiceResponse<int>();
-        //         response = await _practiceModeService.DeleteSavedGameHistory();
+        // FINISHED
+        [HttpDelete("Saved")]
+        public async Task<ActionResult<ServiceResponse<int>>> DeleteSavedGameHistory()
+        {
+            try
+            {
+                var response = new ServiceResponse<int>();
+                response = await _practiceModeService.DeleteSavedGameHistory();
 
-        //         return response;
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         Console.WriteLine("[PracticeModeController] " + e.Message);
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[PracticeModeController] " + e.Message);
 
-        //         return StatusCode(500);
-        //     }
-        // }
+                return StatusCode(500);
+            }
+        }
 
         // FINISHED
         [HttpPost("Saved")]

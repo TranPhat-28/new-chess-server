@@ -78,22 +78,19 @@ namespace new_chess_server.Services.PracticeMode
             var response = new ServiceResponse<int>();
 
             int userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var savedGame = await _dataContext.PracticeModeGameHistories.FirstOrDefaultAsync(game => game.UserId == userId);
-            var user = await _dataContext.Users.FirstOrDefaultAsync(user => user.Id == userId);
+            var savedGame = await _dataContext.PracticeModeGameHistories.Include(game => game.Moves).FirstOrDefaultAsync(game => game.UserId == userId);
 
-            if (savedGame is null || user is null)
+            if (savedGame is null)
             {
                 throw new Exception("Cannot delete saved game");
             }
             else
             {
-                _dataContext.PracticeModeGameHistories.Remove(savedGame);
-                user.PracticeModeGameHistory = null;
-
+                _dataContext.MoveHistoryItems.RemoveRange(savedGame.Moves);
                 await _dataContext.SaveChangesAsync();
 
                 response.Data = savedGame.Id;
-
+                response.Message = "Previously saved game has been remove";
                 return response;
             }
         }
