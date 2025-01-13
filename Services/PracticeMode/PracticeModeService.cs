@@ -55,20 +55,20 @@ namespace new_chess_server.Services.PracticeMode
             return response;
         }
 
-        public async Task<ServiceResponse<List<MoveHistoryItem>>> GetSavedGameHistory()
+        public async Task<ServiceResponse<List<MoveHistoryItemDto>>> GetSavedGameHistory()
         {
-            var response = new ServiceResponse<List<MoveHistoryItem>>();
+            var response = new ServiceResponse<List<MoveHistoryItemDto>>();
 
             int userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var savedGame = await _dataContext.PracticeModeGameHistories.FirstOrDefaultAsync(game => game.UserId == userId);
+            var savedGame = await _dataContext.PracticeModeGameHistories.Include(game => game.Moves).FirstOrDefaultAsync(game => game.UserId == userId);
 
             if (savedGame is null)
             {
-                throw new Exception("Csnnot load saved game");
+                throw new Exception("Cannot load saved game");
             }
             else
             {
-                response.Data = savedGame.Moves;
+                response.Data = savedGame.Moves.Select(m => _mapper.Map<MoveHistoryItemDto>(m)).ToList();
             }
             return response;
         }

@@ -18,6 +18,7 @@ namespace new_chess_server
             CreateMap<User, SearchWithSocialIdResultDto>();
             CreateMap<User, FriendSummaryDetailDto>();
             CreateMap<MoveHistoryItemDto, MoveHistoryItem>();
+            CreateMap<MoveHistoryItem, MoveHistoryItemDto>();
         }
     }
 }
