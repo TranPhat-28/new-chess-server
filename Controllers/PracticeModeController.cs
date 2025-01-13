@@ -42,6 +42,7 @@ namespace new_chess_server.Controllers
             }
         }
 
+        // FINISHED
         [HttpGet("Saved")]
         public async Task<ActionResult<ServiceResponse<List<MoveHistoryItemDto>>>> GetSavedGameHistory()
         {
