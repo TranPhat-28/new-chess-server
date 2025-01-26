@@ -4,6 +4,7 @@ global using new_chess_server.DTOs.AuthenticationDTO;
 global using new_chess_server.Services.Authentication;
 global using Microsoft.EntityFrameworkCore;
 global using System.Security.Claims;
+global using Microsoft.AspNetCore.SignalR;
 global using AutoMapper;
 using new_chess_server.Data;
 using new_chess_server.Services.OAuth;
@@ -15,6 +16,7 @@ using new_chess_server.Services.Social;
 using new_chess_server.Services.Friends;
 using new_chess_server.Services.Stockfish;
 using new_chess_server.Services.PracticeMode;
+using new_chess_server.SignalR;
 
 // Enable CORS
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -27,7 +29,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: MyAllowSpecificOrigins,
         policy =>
         {
-            policy.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+            policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:5173").AllowCredentials();
         });
 });
 
@@ -58,6 +60,7 @@ builder.Services.AddScoped<ISocialService, SocialService>();
 builder.Services.AddScoped<IFriendsService, FriendsService>();
 builder.Services.AddScoped<IPracticeModeService, PracticeModeService>();
 builder.Services.AddSingleton<IStockfishService, StockfishService>();
+builder.Services.AddSignalR();
 
 // -----------CHANGE FOR DEPLOYMENT----------------
 // JWT Secret
@@ -72,6 +75,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(secretToken!)),
         ValidateIssuer = false,
         ValidateAudience = false,
+    };
+
+    // JWT config for Signal R
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+            {
+                context.Token = accessToken;
+            }
+
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -94,5 +114,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<MainConnectionHub>("hubs/main");
 
 app.Run();
