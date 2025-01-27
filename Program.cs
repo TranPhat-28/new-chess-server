@@ -61,6 +61,7 @@ builder.Services.AddScoped<IFriendsService, FriendsService>();
 builder.Services.AddScoped<IPracticeModeService, PracticeModeService>();
 builder.Services.AddSingleton<IStockfishService, StockfishService>();
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<OnlineTracker>();
 
 // -----------CHANGE FOR DEPLOYMENT----------------
 // JWT Secret
