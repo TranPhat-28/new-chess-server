@@ -8,59 +8,59 @@ namespace new_chess_server.SignalR
     public class OnlineTracker
     {
         // Dictionary
-        // String: store user's email
+        // Int: store connecting user's Id
         // List<string>: store all connection of that specific user. A user can connect from multiple
         // devices
-        private static readonly Dictionary<string, List<string>> OnlineUsers = new Dictionary<string, List<string>>();
+        private static readonly Dictionary<int, List<string>> OnlineUsers = new Dictionary<int, List<string>>();
 
-        public Task UserConnected(string email, string connectionId)
+        public Task UserConnected(int userId, string connectionId)
         {
             lock (OnlineUsers)
             {
                 // If key already existed, add a new connection id
-                if (OnlineUsers.ContainsKey(email))
+                if (OnlineUsers.ContainsKey(userId))
                 {
-                    OnlineUsers[email].Add(connectionId);
+                    OnlineUsers[userId].Add(connectionId);
                 }
                 // First connection, add key
                 else
                 {
-                    OnlineUsers.Add(email, new List<string> { connectionId });
+                    OnlineUsers.Add(userId, new List<string> { connectionId });
                 }
             }
 
             return Task.CompletedTask;
         }
 
-        public Task UserDisconnected(string email, string connectionId)
+        public Task UserDisconnected(int userId, string connectionId)
         {
             lock (OnlineUsers)
             {
                 // If no connection
-                if (!OnlineUsers.ContainsKey(email))
+                if (!OnlineUsers.ContainsKey(userId))
                 {
                     return Task.CompletedTask;
                 }
 
                 // Remove connection
-                OnlineUsers[email].Remove(connectionId);
+                OnlineUsers[userId].Remove(connectionId);
 
                 // If count is 0 remove the key
-                if (OnlineUsers[email].Count == 0)
+                if (OnlineUsers[userId].Count == 0)
                 {
-                    OnlineUsers.Remove(email);
+                    OnlineUsers.Remove(userId);
                 }
             }
 
             return Task.CompletedTask;
         }
 
-        public Task<string[]> GetOnlineUsers()
+        public Task<List<int>> GetOnlineUsers()
         {
-            string[] onlineUsers;
+            List<int> onlineUsers;
             lock (OnlineUsers)
             {
-                onlineUsers = OnlineUsers.OrderBy(k => k.Key).Select(k => k.Key).ToArray();
+                onlineUsers = OnlineUsers.OrderBy(k => k.Key).Select(k => k.Key).ToList();
             }
 
             return Task.FromResult(onlineUsers);

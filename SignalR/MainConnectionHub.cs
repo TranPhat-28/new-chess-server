@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace new_chess_server.SignalR
 {
+    [Authorize]
     public class MainConnectionHub : Hub
     {
         private readonly OnlineTracker _onlineTracker;
@@ -19,11 +21,11 @@ namespace new_chess_server.SignalR
         // Server invokes Client
         public override async Task OnConnectedAsync()
         {
-            // Authed User Email
-            var userEmail = _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.Name)!;
+            // Authed User ID
+            var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             // Add the newly connected user to the online tracker
-            await _onlineTracker.UserConnected(userEmail, Context.ConnectionId);
+            await _onlineTracker.UserConnected(userId, Context.ConnectionId);
 
             // Send the list of online users
             var currentUsers = await _onlineTracker.GetOnlineUsers();
@@ -33,11 +35,11 @@ namespace new_chess_server.SignalR
         // Server invokes Client
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            // Authed User Email
-            var userEmail = _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.Name)!;
+            // Authed User ID
+            var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
             // Disconnect the user from the online tracker
-            await _onlineTracker.UserDisconnected(userEmail, Context.ConnectionId);
+            await _onlineTracker.UserDisconnected(userId, Context.ConnectionId);
 
             // Send the list of online users
             var currentUsers = await _onlineTracker.GetOnlineUsers();
@@ -47,7 +49,7 @@ namespace new_chess_server.SignalR
         }
 
         // Client invokes Server
-        public async Task<string[]> GetCurrentOnlineFriends()
+        public async Task<List<int>> GetCurrentOnlineFriends()
         {
             // Return the current list of online users
             return await _onlineTracker.GetOnlineUsers();
