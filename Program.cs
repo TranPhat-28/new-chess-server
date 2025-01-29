@@ -66,6 +66,7 @@ builder.Services.AddScoped<IPracticeModeService, PracticeModeService>();
 builder.Services.AddSingleton<IStockfishService, StockfishService>();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<OnlineTracker>();
+builder.Services.AddSingleton<GameLobbyTracker>();
 
 // -----------CHANGE FOR DEPLOYMENT----------------
 // JWT Secret
@@ -121,5 +122,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapHub<MainConnectionHub>("hubs/main");
+app.MapHub<GameLobbyHub>("hubs/lobby");
 
 app.Run();
