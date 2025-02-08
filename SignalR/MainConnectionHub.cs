@@ -49,8 +49,9 @@ namespace new_chess_server.SignalR
             bool isPlayerOnline = await _onlineTracker.IsUserOnline(userId);
             if (!isPlayerOnline)
             {
-                string removedRoomId = await _gameLobbyTracker.RemoveRoomByHostId(userId);
-                await _gameLobbyHub.Clients.All.SendAsync("RoomRemoved", removedRoomId);
+                await _gameLobbyTracker.RemoveRoomByHostId(userId);
+                var gameList = await _gameLobbyTracker.GetLobbyGameList();
+                await _gameLobbyHub.Clients.All.SendAsync("RoomRemoved", gameList);
             }
 
             // Send the list of online users
