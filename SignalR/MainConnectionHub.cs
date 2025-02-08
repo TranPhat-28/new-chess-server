@@ -11,11 +11,15 @@ namespace new_chess_server.SignalR
     {
         private readonly OnlineTracker _onlineTracker;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly GameLobbyTracker _gameLobbyTracker;
+        private readonly IHubContext<GameLobbyHub> _gameLobbyHub;
 
-        public MainConnectionHub(OnlineTracker onlineTracker, IHttpContextAccessor httpContextAccessor)
+        public MainConnectionHub(OnlineTracker onlineTracker, IHttpContextAccessor httpContextAccessor, GameLobbyTracker gameLobbyTracker, IHubContext<GameLobbyHub> gameLobbyHub)
         {
             _onlineTracker = onlineTracker;
             _httpContextAccessor = httpContextAccessor;
+            _gameLobbyTracker = gameLobbyTracker;
+            _gameLobbyHub = gameLobbyHub;
         }
 
         // Server invokes Client
@@ -40,6 +44,14 @@ namespace new_chess_server.SignalR
 
             // Disconnect the user from the online tracker
             await _onlineTracker.UserDisconnected(userId, Context.ConnectionId);
+
+            // Remove game room created by this user if they are offline
+            bool isPlayerOnline = await _onlineTracker.IsUserOnline(userId);
+            if (!isPlayerOnline)
+            {
+                string removedRoomId = await _gameLobbyTracker.RemoveRoomByHostId(userId);
+                await _gameLobbyHub.Clients.All.SendAsync("RoomRemoved", removedRoomId);
+            }
 
             // Send the list of online users
             var currentUsers = await _onlineTracker.GetOnlineUsers();

@@ -50,7 +50,7 @@ namespace new_chess_server.SignalR
             return Task.FromResult(uniqueId);
         }
 
-        // public Task RemoveRoom(string roomId)
+        // public Task RemoveRoomByRoomId(string roomId)
         // {
         //     lock (GameList)
         //     {
@@ -68,10 +68,38 @@ namespace new_chess_server.SignalR
         //     return Task.CompletedTask;
         // }
 
+        public Task<string> RemoveRoomByHostId(int hostId)
+        {
+            lock (GameList)
+            {
+                var roomToRemove = GameList.Find(room => room.Host.Id == hostId);
+                if (roomToRemove is null)
+                {
+                    Console.WriteLine($"[GameLobbyTracker] All rooms created by player {hostId} have been removed");
+                }
+                else
+                {
+                    GameList.Remove(roomToRemove);
+                }
+
+                return Task.FromResult(roomToRemove?.Id ?? "");
+            }
+        }
+
         public Task<List<GameRoom>> GetLobbyGameList()
         {
-            var gameList = GameList;
-            return Task.FromResult(gameList);
+            lock (GameList)
+            {
+                return Task.FromResult(GameList.ToList()); // Return a new list to avoid unintended modifications
+            }
+        }
+
+        public Task<bool> CheckIfRoomExists(string id)
+        {
+            lock (GameList)
+            {
+                return Task.FromResult(GameList.Any(room => room.Id == id));
+            }
         }
     }
 }

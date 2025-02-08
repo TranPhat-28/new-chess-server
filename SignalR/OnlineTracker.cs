@@ -65,5 +65,13 @@ namespace new_chess_server.SignalR
 
             return Task.FromResult(onlineUsers);
         }
+
+        public Task<bool> IsUserOnline(int userId)
+        {
+            lock (OnlineUsers)
+            {
+                return Task.FromResult(OnlineUsers.ContainsKey(userId));
+            }
+        }
     }
 }
