@@ -17,6 +17,7 @@ using new_chess_server.Services.Friends;
 using new_chess_server.Services.Stockfish;
 using new_chess_server.Services.PracticeMode;
 using new_chess_server.SignalR;
+using new_chess_server.Services.Multiplayer;
 
 // Enable CORS
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -64,6 +65,7 @@ builder.Services.AddScoped<ISocialService, SocialService>();
 builder.Services.AddScoped<IFriendsService, FriendsService>();
 builder.Services.AddScoped<IPracticeModeService, PracticeModeService>();
 builder.Services.AddSingleton<IStockfishService, StockfishService>();
+builder.Services.AddScoped<IMultiplayerService, MultiplayerService>();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<OnlineTracker>();
 builder.Services.AddSingleton<GameLobbyTracker>();

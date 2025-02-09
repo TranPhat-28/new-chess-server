@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using new_chess_server.Data;
 using new_chess_server.DTOs.LobbyDTO;
 
 namespace new_chess_server.SignalR
@@ -9,8 +10,7 @@ namespace new_chess_server.SignalR
     public class GameLobbyTracker
     {
         private static readonly List<GameRoom> GameList = new List<GameRoom>();
-
-        public Task<string> CreateRoom(int hostId, string hostName, bool isPublicRoom, string roomPassword)
+        public Task<string> CreateRoom(int hostId, string hostName, string hostSocialId, string hostProfilePicture, bool isPublicRoom, string roomPassword)
         {
             string uniqueId;
 
@@ -27,8 +27,9 @@ namespace new_chess_server.SignalR
                     var hostInfo = new RoomPlayer
                     {
                         Id = hostId,
-                        Name = hostName
-
+                        Name = hostName,
+                        Picture = hostProfilePicture,
+                        SocialId = hostSocialId
                     };
 
                     // Generate room ID
@@ -94,11 +95,11 @@ namespace new_chess_server.SignalR
             }
         }
 
-        public Task<bool> CheckIfRoomExists(string id)
+        public Task<GameRoom?> GetRoomInfoById(string roomId)
         {
             lock (GameList)
             {
-                return Task.FromResult(GameList.Any(room => room.Id == id));
+                return Task.FromResult(GameList.FirstOrDefault(room => room.Id == roomId));
             }
         }
     }
