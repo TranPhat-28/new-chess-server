@@ -21,13 +21,13 @@ namespace new_chess_server.Controllers
             _multiplayerService = multiplayerService;
         }
 
-        [HttpGet("{roomId}")]
-        public async Task<ActionResult<ServiceResponse<GameRoomDto>>> GetRoomInfo(string roomId)
+        [HttpGet]
+        public ActionResult<ServiceResponse<string>> GetNewRoomId()
         {
             try
             {
-                var response = new ServiceResponse<GameRoomDto>();
-                response = await _multiplayerService.GetRoomInfoById(roomId);
+                var response = new ServiceResponse<string>();
+                response = _multiplayerService.GetNewRoomId();
 
                 return response;
             }

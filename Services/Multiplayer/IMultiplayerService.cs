@@ -8,6 +8,6 @@ namespace new_chess_server.Services.Multiplayer
 {
     public interface IMultiplayerService
     {
-        Task<ServiceResponse<GameRoomDto>> GetRoomInfoById(string roomId);
+        ServiceResponse<string> GetNewRoomId();
     }
 }

@@ -125,5 +125,6 @@ app.MapControllers();
 
 app.MapHub<MainConnectionHub>("hubs/main");
 app.MapHub<GameLobbyHub>("hubs/lobby");
+app.MapHub<GameConnectionHub>("hubs/game");
 
 app.Run();

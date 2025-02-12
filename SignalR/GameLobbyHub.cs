@@ -28,27 +28,5 @@ namespace new_chess_server.SignalR
             // Return the current list of games
             return await _gameLobbyTracker.GetLobbyGameList();
         }
-
-        // Create new room
-        public async Task<string> CreateGameRoom(CreateGameRoomDto createGameRoomDto)
-        {
-            // Authed User ID and Name
-            var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var userName = _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.Name)!;
-
-            var authUser = await _dataContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
-            if (authUser is null)
-            {
-                throw new Exception("[GameLobbyHub] Cannot find user");
-            }
-
-            string newRoomId = await _gameLobbyTracker.CreateRoom(userId, userName, authUser.SocialId, authUser.Picture, createGameRoomDto.IsPublicRoom, createGameRoomDto.RoomPassword);
-
-            // Send live data
-            var gameList = await _gameLobbyTracker.GetLobbyGameList();
-            await Clients.All.SendAsync("NewRoomCreated", gameList);
-
-            return newRoomId;
-        }
     }
 }

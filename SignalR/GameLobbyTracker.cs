@@ -10,10 +10,8 @@ namespace new_chess_server.SignalR
     public class GameLobbyTracker
     {
         private static readonly List<GameRoom> GameList = new List<GameRoom>();
-        public Task<string> CreateRoom(int hostId, string hostName, string hostSocialId, string hostProfilePicture, bool isPublicRoom, string roomPassword)
+        public Task CreateRoom(string roomId, int hostId, string hostName, string hostSocialId, string hostProfilePicture, bool isPublicRoom, string roomPassword)
         {
-            string uniqueId;
-
             lock (GameList)
             {
                 // If key already existed, throw error
@@ -32,13 +30,10 @@ namespace new_chess_server.SignalR
                         SocialId = hostSocialId
                     };
 
-                    // Generate room ID
-                    uniqueId = Guid.NewGuid().ToString("N").Substring(0, 8); // 8-character unique ID
-
                     // Add the room
                     GameList.Add(new GameRoom
                     {
-                        Id = uniqueId,
+                        Id = roomId,
                         Host = hostInfo,
                         Player = null,
                         // Private room to be implemented
@@ -48,7 +43,7 @@ namespace new_chess_server.SignalR
                 }
             }
 
-            return Task.FromResult(uniqueId);
+            return Task.CompletedTask;
         }
 
         // public Task RemoveRoomByRoomId(string roomId)

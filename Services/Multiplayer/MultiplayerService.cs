@@ -17,20 +17,11 @@ namespace new_chess_server.Services.Multiplayer
             _gameLobbyTracker = gameLobbyTracker;
             _mapper = mapper;
         }
-        public async Task<ServiceResponse<GameRoomDto>> GetRoomInfoById(string roomId)
+        public ServiceResponse<string> GetNewRoomId()
         {
-            var response = new ServiceResponse<GameRoomDto>();
-            var gameRoomInfo = await _gameLobbyTracker.GetRoomInfoById(roomId);
+            var response = new ServiceResponse<string>();
+            response.Data = Guid.NewGuid().ToString("N").Substring(0, 8); // 8-character unique ID
 
-            if (gameRoomInfo is null)
-            {
-                response.Data = null;
-                response.Message = "Room does not exist";
-            }
-            else
-            {
-                response.Data = _mapper.Map<GameRoomDto>(gameRoomInfo);
-            }
             return response;
         }
     }
