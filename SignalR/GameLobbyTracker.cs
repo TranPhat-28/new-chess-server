@@ -46,25 +46,25 @@ namespace new_chess_server.SignalR
             return Task.CompletedTask;
         }
 
-        // public Task RemoveRoomByRoomId(string roomId)
-        // {
-        //     lock (GameList)
-        //     {
-        //         var roomToRemove = GameList.Find(room => room.Id == roomId);
-        //         if (roomToRemove is null)
-        //         {
-        //             Console.WriteLine($"Room ID {roomId} is not found on Game Lobby List");
-        //         }
-        //         else
-        //         {
-        //             GameList.Remove(roomToRemove);
-        //         }
-        //     }
+        public Task RemoveRoomByRoomId(string roomId)
+        {
+            lock (GameList)
+            {
+                var roomToRemove = GameList.Find(room => room.Id == roomId);
+                if (roomToRemove is null)
+                {
+                    Console.WriteLine($"Room ID {roomId} is not found on Game Lobby List");
+                }
+                else
+                {
+                    GameList.Remove(roomToRemove);
+                }
+            }
 
-        //     return Task.CompletedTask;
-        // }
+            return Task.CompletedTask;
+        }
 
-        public Task<string> RemoveRoomByHostId(int hostId)
+        public Task RemoveRoomByHostId(int hostId)
         {
             lock (GameList)
             {
@@ -78,7 +78,7 @@ namespace new_chess_server.SignalR
                     GameList.Remove(roomToRemove);
                 }
 
-                return Task.FromResult(roomToRemove?.Id ?? "");
+                return Task.CompletedTask;
             }
         }
 

@@ -14,6 +14,7 @@ namespace new_chess_server.SignalR
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly DataContext _dataContext;
         private readonly IHubContext<GameLobbyHub> _gameLobbyHub;
+        private static readonly Dictionary<string, string> _connections = new();
 
         public GameConnectionHub(GameLobbyTracker gameLobbyTracker, IHttpContextAccessor httpContextAccessor, DataContext dataContext, IHubContext<GameLobbyHub> gameLobbyHub)
         {
@@ -32,6 +33,9 @@ namespace new_chess_server.SignalR
                 throw new Exception("Room id is not defined");
             }
 
+            // Save the connection id - room id so we can use it on OnDisconnectedAsync
+            _connections[Context.ConnectionId] = roomId!;
+
             // Authed User ID and Name
             var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var userName = _httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.Name)!;
@@ -43,7 +47,7 @@ namespace new_chess_server.SignalR
             }
 
             await _gameLobbyTracker.CreateRoom(roomId!, authUser.Id, authUser.Name, authUser.SocialId, authUser.Picture, true, "");
-            
+
             // Send room list to Lobby Hub
             var gameList = await _gameLobbyTracker.GetLobbyGameList();
             await _gameLobbyHub.Clients.All.SendAsync("NewRoomCreated", gameList);
@@ -59,6 +63,38 @@ namespace new_chess_server.SignalR
         // Server invokes Client
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
+            if (_connections.TryGetValue(Context.ConnectionId, out var roomId))
+            {
+                // Remove the room from Room Tracker
+                await _gameLobbyTracker.RemoveRoomByRoomId(roomId);
+                // Send data to Lobby Hub
+                var gameList = await _gameLobbyTracker.GetLobbyGameList();
+                await _gameLobbyHub.Clients.All.SendAsync("RoomRemoved", gameList);
+
+                // User who disconnected
+                var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                // Send "Room disbanded" or "Player left" event to room
+                var roomInfo = await _gameLobbyTracker.GetRoomInfoById(roomId!);
+                if (roomInfo == null)
+                {
+                    throw new HubException("Cannot get room information");
+                }
+                else
+                {
+                    // Send "Room disbanded" or "Player left" event to room
+                    if (userId == roomInfo.Host.Id)
+                    {
+                        await Clients.Group(roomId!).SendAsync("RoomDisbanded");
+                    }
+                    else
+                    {
+                        await Clients.Group(roomId!).SendAsync("PlayerLeft");
+                    }
+                }
+
+                _connections.Remove(Context.ConnectionId); // Remove connection from tracking
+            }
+
             await base.OnDisconnectedAsync(exception);
         }
     }
