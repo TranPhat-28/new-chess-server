@@ -43,10 +43,17 @@ namespace new_chess_server.SignalR
             }
 
             await _gameLobbyTracker.CreateRoom(roomId!, authUser.Id, authUser.Name, authUser.SocialId, authUser.Picture, true, "");
-            // Send room list
+            
+            // Send room list to Lobby Hub
             var gameList = await _gameLobbyTracker.GetLobbyGameList();
             await _gameLobbyHub.Clients.All.SendAsync("NewRoomCreated", gameList);
+
+            // Add player to group
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId!);
+
+            // Send info to Room participants using Game Hub
+            var roomInfo = await _gameLobbyTracker.GetRoomInfoById(roomId!);
+            await Clients.Group(roomId!).SendAsync("UpdateRoomInfo", roomInfo);
         }
 
         // Server invokes Client
