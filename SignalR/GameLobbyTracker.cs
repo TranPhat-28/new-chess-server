@@ -97,5 +97,59 @@ namespace new_chess_server.SignalR
                 return Task.FromResult(GameList.FirstOrDefault(room => room.Id == roomId));
             }
         }
+
+        public Task<bool> CheckIfRoomExists(string roomId)
+        {
+            lock (GameList)
+            {
+                return Task.FromResult(GameList.Any(room => room.Id == roomId));
+            }
+        }
+
+        public Task JoinRoom(string roomId, int playerId, string playerName, string playerSocialId, string playerProfilePicture, string roomPassword)
+        {
+            lock (GameList)
+            {
+                // Player info
+                var playerInfo = new RoomPlayer
+                {
+                    Id = playerId,
+                    Name = playerName,
+                    Picture = playerProfilePicture,
+                    SocialId = playerSocialId
+                };
+
+                // Add to the room
+                var room = GameList.FirstOrDefault(r => r.Id == roomId);
+                if (room != null)
+                {
+                    room.Player = playerInfo;
+                }
+                else
+                {
+                    throw new Exception("Cannot find room to join");
+                }
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task StartRoom(string roomId)
+        {
+            lock (GameList)
+            {
+                var room = GameList.FirstOrDefault(r => r.Id == roomId);
+                if (room != null)
+                {
+                    room.IsPlaying = true;
+                }
+                else
+                {
+                    throw new Exception("Cannot find room to join");
+                }
+            }
+
+            return Task.CompletedTask;
+        }
     }
 }

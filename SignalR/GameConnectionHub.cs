@@ -46,11 +46,20 @@ namespace new_chess_server.SignalR
                 throw new Exception("[GameLobbyHub] Cannot find user");
             }
 
-            await _gameLobbyTracker.CreateRoom(roomId!, authUser.Id, authUser.Name, authUser.SocialId, authUser.Picture, true, "");
+            // If this room not exists yet, create new room
+            var isRoomExist = await _gameLobbyTracker.CheckIfRoomExists(roomId!);
+            if (isRoomExist == false)
+            {
+                await _gameLobbyTracker.CreateRoom(roomId!, authUser.Id, authUser.Name, authUser.SocialId, authUser.Picture, true, "");
+            }
+            else
+            {
+                await _gameLobbyTracker.JoinRoom(roomId!, authUser.Id, authUser.Name, authUser.SocialId, authUser.Picture, "");
+            }
 
             // Send room list to Lobby Hub
             var gameList = await _gameLobbyTracker.GetLobbyGameList();
-            await _gameLobbyHub.Clients.All.SendAsync("NewRoomCreated", gameList);
+            await _gameLobbyHub.Clients.All.SendAsync("LobbyListUpdated", gameList);
 
             // Add player to group
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId!);
@@ -96,6 +105,15 @@ namespace new_chess_server.SignalR
             }
 
             await base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task StartRoom(string roomId)
+        {
+            await _gameLobbyTracker.StartRoom(roomId);
+
+            // Send room list to Lobby Hub
+            var gameList = await _gameLobbyTracker.GetLobbyGameList();
+            await _gameLobbyHub.Clients.All.SendAsync("LobbyListUpdated", gameList);
         }
     }
 }
