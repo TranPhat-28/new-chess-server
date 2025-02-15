@@ -74,12 +74,6 @@ namespace new_chess_server.SignalR
         {
             if (_connections.TryGetValue(Context.ConnectionId, out var roomId))
             {
-                // Remove the room from Room Tracker
-                await _gameLobbyTracker.RemoveRoomByRoomId(roomId);
-                // Send data to Lobby Hub
-                var gameList = await _gameLobbyTracker.GetLobbyGameList();
-                await _gameLobbyHub.Clients.All.SendAsync("RoomRemoved", gameList);
-
                 // User who disconnected
                 var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
                 // Send "Room disbanded" or "Player left" event to room
@@ -93,11 +87,24 @@ namespace new_chess_server.SignalR
                     // Send "Room disbanded" or "Player left" event to room
                     if (userId == roomInfo.Host.Id)
                     {
-                        await Clients.Group(roomId!).SendAsync("RoomDisbanded");
+                        // If Host left, send Disband event first
+                        await Clients.Group(roomId).SendAsync("RoomDisbanded");
+                        // Then remove the room from Room Tracker
+                        await _gameLobbyTracker.RemoveRoomByRoomId(roomId);
+                        // Send updated room list to Lobby Hub
+                        var gameList = await _gameLobbyTracker.GetLobbyGameList();
+                        await _gameLobbyHub.Clients.All.SendAsync("LobbyListUpdated", gameList);
                     }
                     else
                     {
-                        await Clients.Group(roomId!).SendAsync("PlayerLeft");
+                        // If Player left, remove player from Room
+                        await _gameLobbyTracker.RemovePlayerFromRoom(roomId);
+                        // Send updated room list to Lobby Hub
+                        var gameList = await _gameLobbyTracker.GetLobbyGameList();
+                        await _gameLobbyHub.Clients.All.SendAsync("LobbyListUpdated", gameList);
+                        // Send Player left event with new room info
+                        var newRoomInfo = await _gameLobbyTracker.GetRoomInfoById(roomId!);
+                        await Clients.Group(roomId!).SendAsync("PlayerLeft", newRoomInfo);
                     }
                 }
 
@@ -114,6 +121,9 @@ namespace new_chess_server.SignalR
             // Send room list to Lobby Hub
             var gameList = await _gameLobbyTracker.GetLobbyGameList();
             await _gameLobbyHub.Clients.All.SendAsync("LobbyListUpdated", gameList);
+
+            // Send Game Start event to group
+            await Clients.Group(roomId!).SendAsync("GameStarted");
         }
     }
 }
