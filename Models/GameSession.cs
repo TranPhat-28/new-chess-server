@@ -11,5 +11,6 @@ namespace new_chess_server.Models
         public int HostId { get; set; }
         public int PlayerId { get; set; }
         public int MovingPlayerId { get; set; }
+        public List<string> History { get; set; } = new List<string>();
     }
 }

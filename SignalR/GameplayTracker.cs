@@ -34,5 +34,30 @@ namespace new_chess_server.SignalR
                 return Task.FromResult(id ?? -1);
             }
         }
+
+        public Task<GameSession> MakeMove(string roomId, string move)
+        {
+            lock (GameSessionList)
+            {
+                var room = GameSessionList.FirstOrDefault(r => r.Id == roomId);
+                if (room is null)
+                {
+                    throw new Exception($"[GameplayTracker] Cannot find game room with id {roomId}");
+                }
+                // Save new move
+                room.History.Add(move);
+                // Change move turn to the other player
+                if (room.MovingPlayerId == room.HostId)
+                {
+                    room.MovingPlayerId = room.PlayerId;
+                }
+                else
+                {
+                    room.MovingPlayerId = room.HostId;
+                }
+
+                return Task.FromResult(room);
+            }
+        }
     }
 }

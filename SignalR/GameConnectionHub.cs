@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using new_chess_server.Data;
+using new_chess_server.DTOs.MultiplayerModeDTO;
 
 namespace new_chess_server.SignalR
 {
@@ -137,7 +138,14 @@ namespace new_chess_server.SignalR
             // Get whose turn
             var playerTurn = await _gameplayTracker.GetMovingPlayerId(roomId);
             // Send Waiting For Player Move event to group
-            await Clients.Group(roomId!).SendAsync("WaitingForPlayerMove", playerTurn);
+            await Clients.Group(roomId!).SendAsync("WaitingForFirstPlayerMove", playerTurn);
+        }
+    
+        public async Task PlayerMove(PlayerMoveDto playerMoveDto)
+        {
+            var update = await _gameplayTracker.MakeMove(playerMoveDto.RoomId, playerMoveDto.Move);
+            // Send Next Move event to group
+            await Clients.Group(playerMoveDto.RoomId).SendAsync("NextMove", update);
         }
     }
 }
