@@ -14,14 +14,16 @@ namespace new_chess_server.SignalR
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly DataContext _dataContext;
         private readonly IHubContext<GameLobbyHub> _gameLobbyHub;
+        private readonly GameplayTracker _gameplayTracker;
         private static readonly Dictionary<string, string> _connections = new();
 
-        public GameConnectionHub(GameLobbyTracker gameLobbyTracker, IHttpContextAccessor httpContextAccessor, DataContext dataContext, IHubContext<GameLobbyHub> gameLobbyHub)
+        public GameConnectionHub(GameLobbyTracker gameLobbyTracker, IHttpContextAccessor httpContextAccessor, DataContext dataContext, IHubContext<GameLobbyHub> gameLobbyHub, GameplayTracker gameplayTracker)
         {
             _gameLobbyTracker = gameLobbyTracker;
             _httpContextAccessor = httpContextAccessor;
             _dataContext = dataContext;
             _gameLobbyHub = gameLobbyHub;
+            _gameplayTracker = gameplayTracker;
         }
         public override async Task OnConnectedAsync()
         {
@@ -122,8 +124,20 @@ namespace new_chess_server.SignalR
             var gameList = await _gameLobbyTracker.GetLobbyGameList();
             await _gameLobbyHub.Clients.All.SendAsync("LobbyListUpdated", gameList);
 
+            // Get the Host and Player id
+            var roomInfo = await _gameLobbyTracker.GetRoomInfoById(roomId);
+            if (roomInfo is null || roomInfo.Player is null)
+            {
+                throw new Exception("[GameConnectionHub] Cannot start game session because either Room or Player is null");
+            }
+            // Start the Gameplay Tracker
+            await _gameplayTracker.StartGameplay(roomId, roomInfo.Host.Id, roomInfo.Player.Id);
             // Send Game Start event to group
             await Clients.Group(roomId!).SendAsync("GameStarted");
+            // Get whose turn
+            var playerTurn = await _gameplayTracker.GetMovingPlayerId(roomId);
+            // Send Waiting For Player Move event to group
+            await Clients.Group(roomId!).SendAsync("WaitingForPlayerMove", playerTurn);
         }
     }
 }

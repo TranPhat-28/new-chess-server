@@ -69,6 +69,7 @@ builder.Services.AddScoped<IMultiplayerService, MultiplayerService>();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<OnlineTracker>();
 builder.Services.AddSingleton<GameLobbyTracker>();
+builder.Services.AddSingleton<GameplayTracker>();
 
 // -----------CHANGE FOR DEPLOYMENT----------------
 // JWT Secret
