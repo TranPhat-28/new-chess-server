@@ -140,12 +140,12 @@ namespace new_chess_server.SignalR
             // Send Waiting For Player Move event to group
             await Clients.Group(roomId!).SendAsync("WaitingForFirstPlayerMove", playerTurn);
         }
-    
+
         public async Task PlayerMove(PlayerMoveDto playerMoveDto)
         {
             var update = await _gameplayTracker.MakeMove(playerMoveDto.RoomId, playerMoveDto.Move);
             // Send Next Move event to group
-            await Clients.Group(playerMoveDto.RoomId).SendAsync("NextMove", update);
+            await Clients.OthersInGroup(playerMoveDto.RoomId).SendAsync("NextMove", update);
         }
     }
 }
