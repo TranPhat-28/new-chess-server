@@ -12,5 +12,7 @@ namespace new_chess_server.Models
         public int PlayerId { get; set; }
         public int MovingPlayerId { get; set; }
         public List<string> History { get; set; } = new List<string>();
+        public bool IsHostChecked { get; set; }
+        public bool IsPlayerChecked { get; set; }
     }
 }

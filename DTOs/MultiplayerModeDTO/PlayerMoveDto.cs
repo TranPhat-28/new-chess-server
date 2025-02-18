@@ -9,5 +9,6 @@ namespace new_chess_server.DTOs.MultiplayerModeDTO
     {
         public string RoomId { get; set; } = "";
         public string Move { get; set; } = "";
+        public string PlayerId { get; set; } = "";
     }
 }

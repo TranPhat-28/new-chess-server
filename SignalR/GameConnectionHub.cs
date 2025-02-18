@@ -143,7 +143,7 @@ namespace new_chess_server.SignalR
 
         public async Task PlayerMove(PlayerMoveDto playerMoveDto)
         {
-            var update = await _gameplayTracker.MakeMove(playerMoveDto.RoomId, playerMoveDto.Move);
+            var update = await _gameplayTracker.MakeMove(playerMoveDto.RoomId, playerMoveDto.Move, playerMoveDto.PlayerId);
             // Send Next Move event to group
             await Clients.OthersInGroup(playerMoveDto.RoomId).SendAsync("NextMove", update);
         }
