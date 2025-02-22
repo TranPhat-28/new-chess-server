@@ -112,6 +112,27 @@ namespace new_chess_server.SignalR
                     }
                 }
                 // CASE: Player left mid-game
+                else if (roomInfo.IsPlaying == true && roomInfo.IsGameOver == false)
+                {
+                    // Send Opponent left event
+                    await Clients.Group(roomId).SendAsync("OpponentLeft");
+                    // Indicate player left
+                    if (userId == roomInfo.Host.Id)
+                    {
+                        // Host left
+                        roomInfo.HostLeft = true;
+                    }
+                    else
+                    {
+                        // Player left
+                        roomInfo.PlayerLeft = true;
+                    }
+                    // Update room to game over
+                    await _gameLobbyTracker.MarkRoomAsGameOver(roomId);
+                    // Send update to Lobby Hub
+                    var gameList = await _gameLobbyTracker.GetLobbyGameList();
+                    await _gameLobbyHub.Clients.All.SendAsync("LobbyListUpdated", gameList);
+                }
                 // CASE: Game not started
                 // Send "Room disbanded" or "Player left" event to room
                 else
