@@ -169,5 +169,23 @@ namespace new_chess_server.SignalR
 
             return Task.CompletedTask;
         }
+
+        public Task MarkRoomAsGameOver(string roomId)
+        {
+            lock (GameList)
+            {
+                var room = GameList.FirstOrDefault(r => r.Id == roomId);
+                if (room != null)
+                {
+                    room.IsGameOver = true;
+                }
+                else
+                {
+                    throw new Exception($"Cannot find room with id {roomId}");
+                }
+            }
+
+            return Task.CompletedTask;
+        }
     }
 }

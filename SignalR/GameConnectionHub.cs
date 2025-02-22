@@ -149,6 +149,11 @@ namespace new_chess_server.SignalR
             if (update.IsGameOver)
             {
                 await Clients.Group(playerMoveDto.RoomId).SendAsync("GameOver", update);
+                // Update room to game over
+                await _gameLobbyTracker.MarkRoomAsGameOver(playerMoveDto.RoomId);
+                // Send update to Lobby Hub
+                var gameList = await _gameLobbyTracker.GetLobbyGameList();
+                await _gameLobbyHub.Clients.All.SendAsync("LobbyListUpdated", gameList);
             }
         }
     }
