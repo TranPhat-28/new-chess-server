@@ -146,6 +146,10 @@ namespace new_chess_server.SignalR
             var update = await _gameplayTracker.MakeMove(playerMoveDto.RoomId, playerMoveDto.Move, playerMoveDto.PlayerId);
             // Send Next Move event to group
             await Clients.OthersInGroup(playerMoveDto.RoomId).SendAsync("NextMove", update);
+            if (update.IsGameOver)
+            {
+                await Clients.Group(playerMoveDto.RoomId).SendAsync("GameOver", update);
+            }
         }
     }
 }

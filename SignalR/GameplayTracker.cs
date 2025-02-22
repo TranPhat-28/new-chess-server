@@ -68,7 +68,7 @@ namespace new_chess_server.SignalR
                 // Reset the checkmate status
                 room.IsHostChecked = false;
                 room.IsPlayerChecked = false;
-                
+
                 if (board.WhiteKingChecked)
                 {
                     room.IsHostChecked = true;
@@ -76,6 +76,14 @@ namespace new_chess_server.SignalR
                 if (board.BlackKingChecked)
                 {
                     room.IsPlayerChecked = true;
+                }
+
+                // Check if game is over
+                if (board.IsEndGame)
+                {
+                    room.IsGameOver = true;
+                    room.WinnerId = board.EndGame?.WonSide == PieceColor.White ? room.HostId : room.PlayerId;
+                    room.WinReason = board.EndGame?.EndgameType.ToString() ?? "Unknown";
                 }
 
                 return Task.FromResult(room);
