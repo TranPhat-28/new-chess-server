@@ -13,6 +13,8 @@ namespace new_chess_server.Models
         public bool IsPrivate { get; set; } = false;
         public bool IsPlaying { get; set; } = false;
         public bool IsGameOver { get; set; } = false;
+        public bool HostLeft { get; set; } = false;
+        public bool PlayerLeft { get; set; } = false;
     }
 
     public class RoomPlayer

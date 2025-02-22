@@ -79,12 +79,41 @@ namespace new_chess_server.SignalR
             {
                 // User who disconnected
                 var userId = int.Parse(_httpContextAccessor.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-                // Send "Room disbanded" or "Player left" event to room
+
+                // Get room info
                 var roomInfo = await _gameLobbyTracker.GetRoomInfoById(roomId!);
                 if (roomInfo == null)
                 {
                     throw new HubException("Cannot get room information");
                 }
+
+                // CASE: Game ended
+                if (roomInfo.IsGameOver == true)
+                {
+                    // Indicate player left
+                    if (userId == roomInfo.Host.Id)
+                    {
+                        // Host left
+                        roomInfo.HostLeft = true;
+                    }
+                    else
+                    {
+                        // Player left
+                        roomInfo.PlayerLeft = true;
+                    }
+                    // Remove the room when all players have left
+                    if (roomInfo.HostLeft && roomInfo.PlayerLeft)
+                    {
+                        // Remove the room from Room Tracker
+                        await _gameLobbyTracker.RemoveRoomByRoomId(roomId);
+                        // Send updated room list to Lobby Hub
+                        var gameList = await _gameLobbyTracker.GetLobbyGameList();
+                        await _gameLobbyHub.Clients.All.SendAsync("LobbyListUpdated", gameList);
+                    }
+                }
+                // CASE: Player left mid-game
+                // CASE: Game not started
+                // Send "Room disbanded" or "Player left" event to room
                 else
                 {
                     // Send "Room disbanded" or "Player left" event to room
